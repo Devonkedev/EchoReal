@@ -297,6 +297,31 @@ def get_user_byid(user_id: str) -> Any:
     return jsonify({"res": user_data})
 
 
+@app.route("/genius/generate", methods=["GET"])
+def genius_generate() -> Any:
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user_id is required"}), 400
+    global text
+
+    with get_connection() as conn:
+        cur = conn.execute("SELECT * FROM journal_entries WHERE user_id = ?", (user_id,))
+        row = cur.fetchone()
+    if row is None:
+        return jsonify({"error": "Entry not found"}), 404
+   
+    text = row["text"]
+    if not text:
+        return jsonify({"error": "No text found in entry"}), 400
+
+    
+    from matcher import match
+    from api import ana
+
+    result = match(text, ana)   
+    return jsonify({"result": result})
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))

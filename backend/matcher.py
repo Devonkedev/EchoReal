@@ -163,17 +163,4 @@ def match(txt, ana_fn):
     if not top_tracks:
         return "No songs found for your mood."
     
-    result = f"Songs matching your journal entry:\n\n"
-    
-    for i, (track, score) in enumerate(top_tracks, 1):
-        result += f"{i}. {track['title']} by {track['artist']}\n"
-        result += f"   {track['link']}\n"
-        result += f"   Popularity: {track['popularity']}/100\n\n"
-    
-    return result.strip()
-
-
-if __name__ == "__main__":
-    journal = input("Your journal entry: ")
-    result = match(journal, ana)
-    print(result)
+    return top_tracks
