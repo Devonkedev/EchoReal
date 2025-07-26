@@ -252,6 +252,21 @@ def get_streak(user_id: str) -> Any:
     streak = row["streak_count"] if row else 0
     return jsonify({"streak_count": streak})
 
+@app.route("/users", methods=["GET"])
+def get_user() -> Any:
+    with get_connection() as conn:
+        cur = conn.execute("SELECT * FROM users ")
+        cur_rows = cur.fetchall()
+    users = []
+    for row in cur_rows:
+        users.append({
+            "user_id": row["user_id"],
+            "streak_count": row["streak_count"],
+            "last_entry_date": row["last_entry_date"]
+        })
+
+    return jsonify({"result": users})
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port, debug=True)
