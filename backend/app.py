@@ -322,6 +322,65 @@ def genius_generate() -> Any:
     return jsonify({"result": result})
 
 
+@app.route("/session/create/<user_id>", methods=["GET"])
+def create_session(user_id: str) -> Any:
+
+    if not user_id:
+        return jsonify({"error": "user_id is required"}), 400
+    with get_connection() as conn:
+        cur = conn.execute(
+            "SELECT * from sessions where user_id = ?", (user_id,))
+        existing_session = cur.fetchone()
+
+
+    with get_connection() as conn:
+        cur = conn.execute(
+            "INSERT INTO sessions (user_id, currentDate, expiryDate) VALUES (?,?,?)", (user_id, datetime.utcnow().isoformat(), (datetime.utcnow() + timedelta(days=30)).isoformat()))
+
+        conn.commit()
+
+    return jsonify({"status": "session created", "session": {
+        "user_id": user_id,
+        "currentDate": datetime.utcnow().isoformat(),
+        "expiryDate": (datetime.utcnow() + timedelta(days=30)).isoformat()
+    }}), 201
+
+
+@app.route("/session/validate/<user_id>", methods=["GET"])
+def validate_session(user_id: str) -> Any:
+    if not user_id:
+        return jsonify({"error": "user_id is required"}), 400
+    with get_connection() as conn:
+        cur = conn.execute(
+            "SELECT * from sessions where user_id = ?", (user_id,))
+        session = cur.fetchone()
+    if not session:
+        return jsonify({"error": "Session not found"}), 404
+    
+    current_date = datetime.utcnow()
+    expiry_date = datetime.fromisoformat(session["expiryDate"])
+
+    if current_date > expiry_date:
+        return jsonify({"error": "Session expired"}), 403
+
+    return jsonify({"status": "session valid", "session": {
+        "user_id": session["user_id"],
+        "currentDate": session["currentDate"],
+        "expiryDate": session["expiryDate"]
+    }}), 200
+
+@app.route("/session/delete/<user_id>", methods=["GET"])
+def delete_session(user_id: str) -> Any:
+    if not user_id:
+        return jsonify({"error": "user_id is required"}), 400
+    with get_connection() as conn:
+        cur = conn.execute(
+            "DELETE FROM sessions WHERE user_id = ?", (user_id,))
+        if cur.rowcount == 0:
+            return jsonify({"error": "Session not found"}), 404
+        conn.commit()
+    return jsonify({"status": "session deleted"}), 200
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
