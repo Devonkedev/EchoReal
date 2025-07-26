@@ -1,13 +1,17 @@
 import requests, base64, re
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
 from api import ana
-
+from dotenv import load_dotenv
+import os
 load_dotenv()
 
-GENIUS_KEY = "af2HLO68CXyzG2HqM8HWtQt8bMgWymjYPpaORbbLMtn2AJx9YklwbJNlH4f9W5Lm"
-SPOT_ID = "815e46212f474369b92d047545b7f637"
-SPOT_SEC = "43c6066f12ae44cb9e08fb5d678a61a1"
+GENIUS_KEY = os.getenv("GENIUS_KEY")
+SPOT_ID = os.getenv("SPOT_ID")
+SPOT_SEC = os.getenv("SPOT_SEC")
+
+print(f"GENIUS_KEY: {GENIUS_KEY}")
+print(f"SPOT_ID: {SPOT_ID}")
+print(f"SPOT_SEC: {SPOT_SEC}")
 
 
 def g_search(q):
