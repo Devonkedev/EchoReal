@@ -267,6 +267,37 @@ def get_user() -> Any:
 
     return jsonify({"result": users})
 
+@app.route("/users/<user_id>", methods=["POST"])
+def create_user(user_id: str) -> Any:
+    with get_connection() as conn:
+        cur = conn.execute(
+            "INSERT OR IGNORE INTO users (user_id, streak_count, last_entry_date) VALUES (?, 0, NULL)",
+            (user_id,)
+        )
+        conn.commit()
+    if cur.rowcount == 0:
+        return jsonify({"error": "User already exists"}), 400
+    return jsonify({"status": "created"}), 201
+
+@app.route("/users/get/<user_id>", methods=["GET"])
+def get_user_byid(user_id: str) -> Any:
+    with get_connection() as conn:
+        cur = conn.execute(
+            "SELECT * FROM users WHERE user_id = ?", (user_id,)
+        )
+        cur = cur.fetchone()
+
+    if cur is None:
+        return jsonify({"error": "User not found"}), 404
+    user_data = {
+        "user_id": cur["user_id"],
+        "streak_count": cur["streak_count"],
+        "last_entry_date": cur["last_entry_date"]
+    }
+    return jsonify({"res": user_data})
+
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port, debug=True)
