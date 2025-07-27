@@ -1,16 +1,50 @@
 ---
- import '../styles/global.css' 
+const { title = "Echo Journal" } = Astro.props;
+
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-    <main>
-        <slot />
+  <head>
+    <meta charset="UTF-8" />
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+	<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  </head>
+	<aside class="w-64 bg-white border-r flex flex-col justify-between">
+        <div>
+          <div class="flex items-center px-6 py-4 text-2xl font-semibold border-b">
+            <i class=""></i> Echo
+          </div>
+          <nav class="mt-4 ">
+            <ul>
+              <li class="px-6 py-3 bg-gray-100 text-gray-900 font-medium">
+                <i class="fas fa-chart-line mr-2"></i> Dashboard
+              </li>
+              <li class="px-6 py-3 hover:bg-gray-100 cursor-pointer">
+                <i class="fas fa-book-open mr-2"></i> Journal
+              </li>
+              <li class="px-6 py-3 hover:bg-gray-100 cursor-pointer">
+                <i class="fas fa-music mr-2"></i> Music Healing
+              </li>
+              <li class="px-6 py-3 hover:bg-gray-100 cursor-pointer">
+                <i class="fas fa-user-friends mr-2"></i> Friends
+              </li>
+              <li class="px-6 py-3 hover:bg-gray-100 cursor-pointer">
+                <i class="fas fa-cog mr-2"></i> Profile
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="px-6 py-4 border-t flex items-center space-x-2">
+          <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-semibold">S</div>
+          <div>
+            <p class="text-sm font-medium">s</p>
+            <p class="text-xs text-gray-500">s@s</p>
+          </div>
+        </div>
+      </aside>
+    <main class="max-w-4xl mx-auto">
+      <slot />
     </main>
 </html>

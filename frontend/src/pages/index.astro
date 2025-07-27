@@ -1,25 +1,35 @@
 ---
-import Entry from "../components/Entry.astro";
-import Layout from "../layouts/Layout.astro";
-
-const entries = await fetch("http://127.0.0.1:5001/journal/entries?user_id=aanvi")
-  .then((res) => res.json())
-  .catch((err) => {
-	console.error("Error fetching entries:", err);
-	return [];
-  });
-
-console.log("Fetched entries:", entries[1]);
+import Layout from '../layouts/Layout.astro';
 ---
+<Layout>
+  <body class="bg-gray-50 font-sans">
+    <div class="flex h-screen">
+      <main class="flex-1 p-8 overflow-y-auto">
+        <div class="text-2xl font-semibold">Welcome back! <span class="ml-2">👋</span></div>
+        <p class="text-sm text-gray-500 mb-6">How are you feeling today?</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="bg-white rounded-xl shadow-sm p-4 border">
+            <p class="text-sm text-gray-600">Today's Entries</p>
+            <p class="text-3xl font-semibold text-black">0</p>
+            <p class="text-xs text-gray-400">journal entries today</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-4 border">
+            <p class="text-sm text-gray-600">Current Streak</p>
+            <p class="text-3xl font-semibold text-black">0</p>
+            <p class="text-xs text-gray-400">days in a row</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-4 border">
+            <p class="text-sm text-gray-600">Total Entries</p>
+            <p class="text-3xl font-semibold text-black">0</p>
+            <p class="text-xs text-gray-400">all time</p>
+          </div>
+        </div>
 
-<Layout
-  title="Home"
-  description="Welcome to our homepage. Explore our content and learn more about what we offer."
->
-<div class="text-xl">
-	  <h1 class="text-3xl font-bold mb-4">Welcome to Our Homepage</h1>
-  <p class="mb-4">Explore our content and learn more about what we offer.</p>
-
-  <Entry entries={entries} />
-
-</Layout> 
+        <div class="bg-white rounded-xl shadow-sm p-4 border">
+          <p class="text-sm font-medium text-gray-700 mb-2">Recent Entries</p>
+          <p class="text-sm text-gray-500">No entries yet. Start journaling to see your progress!</p>
+        </div>
+      </main>
+    </div>
+  </body>
+</Layout>
