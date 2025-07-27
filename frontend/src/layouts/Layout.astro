@@ -1,55 +1,83 @@
+
 ---
 const { title = "Echo Journal" } = Astro.props;
 
-const nav = [
-  { name: "Dashboard", icon: "fas fa-chart-line", link: "/" },
-  { name: "Journal", icon: "fas fa-book-open", link: "/journal" },
-  { name: "Music Healing", icon: "fas fa-music", link: "/music" },
-  { name: "Friends", icon: "fas fa-user-friends", link: "/friends" },
-  { name: "Profile", icon: "fas fa-cog", link: "/profile" }
-];
-
+// Get current path to highlight active nav item
+const currentPath = Astro.url.pathname;
 ---
 
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-	<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   </head>
-  <body class="flex">
-	<aside class="max-w-fit min-w-64 bg-white border-r h-screen *:flex flex-col justify-between">
+  <body class="flex min-h-screen bg-gray-50">
+    <aside class="w-64 bg-white border-r flex flex-col justify-between">
+      <div>
+        <div class="flex items-center px-6 py-4 text-2xl font-semibold border-b">
+          <i class="fas fa-microphone mr-2"></i> Echo
+        </div>
+        <nav class="mt-4">
+          <ul>
+            <li class={`px-6 py-3 ${currentPath === '/' || currentPath === '/index.html' ? 'bg-gray-100 text-gray-900 font-medium' : 'hover:bg-gray-100'} cursor-pointer`}>
+              <a href="/" class="flex items-center w-full">
+                <i class="fas fa-chart-line mr-2"></i> Dashboard
+              </a>
+            </li>
+            <li class={`px-6 py-3 ${currentPath === '/playlist.html' || currentPath === '/playlist' ? 'bg-gray-100 text-gray-900 font-medium' : 'hover:bg-gray-100'} cursor-pointer`}>
+              <a href="/playlist.html" class="flex items-center w-full">
+                <i class="fas fa-music mr-2"></i> Playlists
+              </a>
+            </li>
+            <li class={`px-6 py-3 ${currentPath === '/friends.html' || currentPath === '/friends' ? 'bg-gray-100 text-gray-900 font-medium' : 'hover:bg-gray-100'} cursor-pointer`}>
+              <a href="/friends.html" class="flex items-center w-full">
+                <i class="fas fa-user-friends mr-2"></i> Friends
+              </a>
+            </li>
+            <li class={`px-6 py-3 ${currentPath === '/profile.html' || currentPath === '/profile' ? 'bg-gray-100 text-gray-900 font-medium' : 'hover:bg-gray-100'} cursor-pointer`}>
+              <a href="/profile.html" class="flex items-center w-full">
+                <i class="fas fa-cog mr-2"></i> Profile
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="px-6 py-4 border-t flex items-center space-x-2">
+        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-semibold text-white">S</div>
         <div>
-          <div class="flex items-center px-6 py-4 text-2xl font-semibold border-b">
-            <i class=""></i> <img src="vrindavij.gif" alt="Echo Journal Logo" class="w-8 h-8 mr-2"/>
-          </div>
-          <nav class="mt-4">
-            <ul>
-            {nav.map ((item) => (
-            <a href={item.link} class="block">
-              <li class={`px-6 py-3 hover:bg-gray-100 cursor-pointer ${item.link === Astro.url.pathname ? 'bg-gray-200 font-semibold' : ''}`}>
-                <i class={`${item.icon} mr-2`}></i> {item.name}
-              </li>
-            </a>)
-)}
-              
-          </nav>
+          <p class="text-sm font-medium">shayan</p>
+          <p class="text-xs text-gray-500">shayan@labubu.com</p>
         </div>
-        <div class="px-6 py-4 border-t flex items-center align-bottom space-x-2 bottom-0">
-          <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-semibold">S</div>
-          <div>
-            <p class="text-sm font-medium">s</p>
-            <p class="text-xs text-gray-500">s@s</p>
-          </div>
-        </div>
-      </aside>
-    <main class="max-w-4xl mx-auto">
-      <slot />
+      </div>
+    </aside>
+    
+    <main class="flex-1 overflow-auto">
+      <div class="max-w-6xl mx-auto p-8">
+        <slot />
+      </div>
     </main>
 
-</body>
+    <script>
 
-</div>
+      document.addEventListener('DOMContentLoaded', () => {
+        const navLinks = document.querySelectorAll('nav a');
+        
+        navLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+            // Add loading state
+            const icon = link.querySelector('i');
+            if (icon) {
+              icon.classList.add('fa-spin');
+              setTimeout(() => {
+                icon.classList.remove('fa-spin');
+              }, 500);
+            }
+          });
+        });
+      });
+    </script>
+  </body>
 </html>
