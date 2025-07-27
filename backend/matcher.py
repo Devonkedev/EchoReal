@@ -9,11 +9,6 @@ GENIUS_KEY = os.getenv("GENIUS_KEY")
 SPOT_ID = os.getenv("SPOT_ID")
 SPOT_SEC = os.getenv("SPOT_SEC")
 
-print(f"GENIUS_KEY: {GENIUS_KEY}")
-print(f"SPOT_ID: {SPOT_ID}")
-print(f"SPOT_SEC: {SPOT_SEC}")
-
-
 def g_search(q):
     h = {"Authorization": f"Bearer {GENIUS_KEY}"}
     r = requests.get("https://api.genius.com/search", headers=h, params={"q": q})
