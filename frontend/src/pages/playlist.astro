@@ -1,0 +1,116 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const playlists = [
+  {
+    id: 1,
+    name: "Morning Vibes",
+    description: "Perfect for starting your day",
+    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+    songCount: 24,
+    duration: "1h 32m",
+    lastPlayed: "2 days ago"
+  },
+  {
+    id: 2,
+    name: "Focus Flow",
+    description: "Deep work and concentration",
+    image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=300&fit=crop",
+    songCount: 18,
+    duration: "58m",
+    lastPlayed: "1 week ago"
+  },
+  {
+    id: 3,
+    name: "Chill Evenings",
+    description: "Relaxing tunes for unwinding",
+    image: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400&h=300&fit=crop",
+    songCount: 31,
+    duration: "2h 15m",
+    lastPlayed: "3 days ago"
+  },
+  {
+    id: 4,
+    name: "Workout Energy",
+    description: "High-energy tracks for exercise",
+    image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
+    songCount: 27,
+    duration: "1h 48m",
+    lastPlayed: "5 days ago"
+  },
+  {
+    id: 5,
+    name: "Study Sessions",
+    description: "Instrumental and ambient sounds",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
+    songCount: 22,
+    duration: "1h 23m",
+    lastPlayed: "1 week ago"
+  },
+  {
+    id: 6,
+    name: "Road Trip Mix",
+    description: "Adventures and good times",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    songCount: 35,
+    duration: "2h 42m",
+    lastPlayed: "2 weeks ago"
+  }
+];
+---
+
+<Layout>
+  <div class="bg-white text-black font-sans min-h-screen px-6 py-12">
+    <div class="max-w-7xl mx-auto">
+      <!-- Page Header -->
+      <div class="mb-10">
+        <h1 class="text-4xl font-extrabold mb-2 tracking-tight">My Playlists</h1>
+        <p class="text-lg text-gray-600">Your personal collection of curated music</p>
+      </div>
+
+      <!-- Grid Section Title -->
+      <h2 class="text-2xl font-semibold mb-6">Recently Played</h2>
+
+      <!-- Playlist Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {playlists.map((playlist) => (
+          <div 
+            class="relative bg-black text-white rounded-[1.5rem] overflow-hidden shadow-xl transition-all duration-300 group hover:-translate-y-1 hover:shadow-2xl"
+            data-playlist-id={playlist.id}
+          >
+            <!-- Image with corner cut -->
+            <div class="relative">
+              <img 
+                src={playlist.image} 
+                alt={playlist.name}
+                class="w-full h-48 object-cover brightness-75 group-hover:brightness-100 transition duration-300 rounded-t-[1.5rem]"
+              />
+              <!-- Play button -->
+              <button 
+                aria-label={"Play " + playlist.name}
+                class="absolute top-4 right-4 w-11 h-11 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-200 group-hover:shadow-md"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M6 4l10 6-10 6V4z" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Content section -->
+            <div class="p-6 bg-white text-black rounded-b-[1.5rem]">
+              <h3 class="text-xl font-bold mb-1">{playlist.name}</h3>
+              <p class="text-sm text-gray-500 mb-4">{playlist.description}</p>
+              <div class="flex justify-between items-center text-sm text-gray-600">
+                <div class="flex gap-3">
+                  <span>♪ {playlist.songCount}</span>
+                  <span>⏱ {playlist.duration}</span>
+                </div>
+                <span class="text-xs text-gray-400">{playlist.lastPlayed}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</Layout>
