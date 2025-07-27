@@ -1,3 +1,4 @@
+import react from 'react';
 import { useState } from 'react';
 import { Search, UserPlus, Users, Share, MessageCircle, Music, Heart, Plus } from 'lucide-react';
 import { Button } from './ui/button';

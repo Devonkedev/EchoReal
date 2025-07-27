@@ -7,7 +7,8 @@ import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { recommendationService } from '../lib/recommendations.js';
 import { JournalEntryType } from '../App';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
+import react from 'react';
 
 interface MusicRecommendationsProps {
   journalEntries: JournalEntryType[];
