@@ -1,6 +1,6 @@
 import requests, base64, re
 from bs4 import BeautifulSoup
-from api import ana
+from backend.lib.semantics import ana
 from dotenv import load_dotenv
 import os
 load_dotenv()

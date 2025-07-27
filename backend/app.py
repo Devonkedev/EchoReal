@@ -338,8 +338,8 @@ def genius_generate() -> Any:
         return jsonify({"error": "No text found in entry"}), 400
 
     
-    from matcher import match
-    from api import ana
+    from backend.lib.matcher import match
+    from backend.lib.semantics import ana
 
     result = match(text, ana)   
     return jsonify({"result": result})
