@@ -1,0 +1,31 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+    <body class="bg-gray-50 font-sans">
+        <div class="flex h-screen">
+        <main class="flex-1 p-8 overflow-y-auto">
+            <div class="text-2xl font-semibold">Music Library</div>
+            <p class="text-sm text-gray-500 mb-6">Explore your favorite tracks and albums.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-white rounded-xl shadow-sm p-4 border">
+                <p class="text-sm text-gray-600">Total Tracks</p>
+                <p class="text-3xl font-semibold text-black">0</p>
+                <p class="text-xs text-gray-400">tracks in your library</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-4 border">
+                <p class="text-sm text-gray-600">Total Albums</p>
+                <p class="text-3xl font-semibold text-black">0</p>
+                <p class="text-xs text-gray-400">albums in your library</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-4 border">
+                <p class="text-sm text-gray-600">Total Artists</p>
+                <p class="text-3xl font-semibold text-black">0</p>
+                <p class="text-xs text-gray-400">artists in your library</p>
+            </div>
+            </div>
+        </main>
+        </div>
+    </body>
+</Layout>
