@@ -5,8 +5,16 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+
+from fastapi import FastAPI, HTTPException, Request, Query, Body
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel
+import uvicorn
 
 DATABASE_PATH = os.environ.get("ECHO_DB", os.path.join(os.path.dirname(__file__), "echo.db"))
 
@@ -119,16 +127,45 @@ CORS(app)
 
 init_db()
 
-@app.route("/journal/entries", methods=["POST"])
-def create_entry() -> Any:
-    data: Dict[str, Any] = request.get_json(force=True)
-    user_id = data.get("user_id")
-    mood = data.get("mood")
-    text = data.get("text")
-    if not user_id or not mood or text is None:
-        return jsonify({"error": "user_id, mood and text are required"}), 400
-    mood_intensity = data.get("mood_intensity")
-    spotify_track_id = data.get("spotify_track_id")
+
+
+app = FastAPI(
+    title="EchoReal API",
+    description="API for EchoReal journaling and music recommendation app.",
+    version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class JournalEntryCreate(BaseModel):
+    user_id: str
+    mood: str
+    text: str
+    mood_intensity: Optional[int] = None
+    spotify_track_id: Optional[str] = None
+
+class JournalEntryUpdate(BaseModel):
+    mood: Optional[str] = None
+    mood_intensity: Optional[int] = None
+    text: Optional[str] = None
+
+class ShareRequest(BaseModel):
+    entry_id: int
+    recipients: List[str]
+
+class AttachSongRequest(BaseModel):
+    track_id: str
+
+@app.post("/journal/entries", status_code=201)
+async def create_entry(entry: JournalEntryCreate):
+    if not entry.user_id or not entry.mood or entry.text is None:
+        raise HTTPException(status_code=400, detail="user_id, mood and text are required")
     now = datetime.utcnow()
     ts_str = now.isoformat()
     shared_to_json = json.dumps([])
@@ -140,24 +177,23 @@ def create_entry() -> Any:
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                user_id,
+                entry.user_id,
                 ts_str,
-                mood,
-                mood_intensity,
-                text,
-                spotify_track_id,
+                entry.mood,
+                entry.mood_intensity,
+                entry.text,
+                entry.spotify_track_id,
                 shared_to_json,
                 liked_tracks_json,
             ),
         )
         entry_id = cur.lastrowid
         conn.commit()
-    update_streak(user_id, now.date())
-    return jsonify({"entry_id": entry_id, "status": "created"}), 201
+    update_streak(entry.user_id, now.date())
+    return {"entry_id": entry_id, "status": "created"}
 
-@app.route("/journal/entries", methods=["GET"])
-def list_entries() -> Any:
-    user_id = request.args.get("user_id")
+@app.get("/journal/entries")
+async def list_entries(user_id: Optional[str] = Query(None)):
     query = "SELECT * FROM journal_entries"
     params: List[Any] = []
     if user_id:
@@ -168,60 +204,58 @@ def list_entries() -> Any:
         cur = conn.execute(query, params)
         rows = cur.fetchall()
     entries = [to_entry_dict(row) for row in rows]
-    return jsonify(entries)
+    return entries
 
-@app.route("/journal/entries/<int:entry_id>", methods=["GET"])
-def get_entry(entry_id: int) -> Any:
+@app.get("/journal/entries/{entry_id}")
+async def get_entry(entry_id: int):
     with get_connection() as conn:
         cur = conn.execute("SELECT * FROM journal_entries WHERE id = ?", (entry_id,))
         row = cur.fetchone()
     if row is None:
-        return jsonify({"error": "Entry not found"}), 404
-    return jsonify(to_entry_dict(row))
+        raise HTTPException(status_code=404, detail="Entry not found")
+    return to_entry_dict(row)
 
-@app.route("/journal/entries/<int:entry_id>", methods=["PATCH", "PUT"])
-def update_entry(entry_id: int) -> Any:
-    data: Dict[str, Any] = request.get_json(force=True)
+@app.patch("/journal/entries/{entry_id}")
+@app.put("/journal/entries/{entry_id}")
+async def update_entry(entry_id: int, entry: JournalEntryUpdate):
     allowed = {"mood", "mood_intensity", "text"}
-    updates = {k: v for k, v in data.items() if k in allowed}
+    updates = {k: v for k, v in entry.dict(exclude_unset=True).items() if k in allowed}
     if not updates:
-        return jsonify({"error": "No updatable fields provided"}), 400
+        raise HTTPException(status_code=400, detail="No updatable fields provided")
     sets = ", ".join(f"{k} = ?" for k in updates.keys())
     params = list(updates.values()) + [entry_id]
     with get_connection() as conn:
         cur = conn.execute(f"UPDATE journal_entries SET {sets} WHERE id = ?", params)
         if cur.rowcount == 0:
-            return jsonify({"error": "Entry not found"}), 404
+            raise HTTPException(status_code=404, detail="Entry not found")
         conn.commit()
-    return jsonify({"status": "updated"})
+    return {"status": "updated"}
 
-@app.route("/journal/entries/<int:entry_id>", methods=["DELETE"])
-def delete_entry(entry_id: int) -> Any:
+@app.delete("/journal/entries/{entry_id}")
+async def delete_entry(entry_id: int):
     with get_connection() as conn:
         cur = conn.execute("DELETE FROM journal_entries WHERE id = ?", (entry_id,))
         if cur.rowcount == 0:
-            return jsonify({"error": "Entry not found"}), 404
+            raise HTTPException(status_code=404, detail="Entry not found")
         conn.commit()
-    return jsonify({"status": "deleted"})
+    return {"status": "deleted"}
 
-@app.route("/journal/entries/<int:entry_id>/attach-song", methods=["POST"])
-def attach_song(entry_id: int) -> Any:
-    data: Dict[str, Any] = request.get_json(force=True)
-    track_id = data.get("track_id")
-    if not track_id:
-        return jsonify({"error": "track_id is required"}), 400
+@app.post("/journal/entries/{entry_id}/attach-song")
+async def attach_song(entry_id: int, req: AttachSongRequest):
+    if not req.track_id:
+        raise HTTPException(status_code=400, detail="track_id is required")
     with get_connection() as conn:
         cur = conn.execute(
             "UPDATE journal_entries SET spotify_track_id = ? WHERE id = ?",
-            (track_id, entry_id),
+            (req.track_id, entry_id),
         )
         if cur.rowcount == 0:
-            return jsonify({"error": "Entry not found"}), 404
+            raise HTTPException(status_code=404, detail="Entry not found")
         conn.commit()
-    return jsonify({"status": "attached"})
+    return {"status": "attached"}
 
-@app.route("/recommendations", methods=["GET"])
-def recommendations() -> Any:
+@app.get("/recommendations")
+async def recommendations():
     songs = [
         {
             "track_id": "spotify:track:7ouMYWpwJ422jRcDASZB7P",
@@ -242,20 +276,19 @@ def recommendations() -> Any:
             "mood": "hopeful",
         },
     ]
-    return jsonify({"songs": songs})
+    return {"songs": songs}
 
-@app.route("/share", methods=["POST"])
-def share() -> Any:
-    data: Dict[str, Any] = request.get_json(force=True)
-    entry_id = data.get("entry_id")
-    recipients: List[str] = data.get("recipients", [])
+@app.post("/share")
+async def share(req: ShareRequest):
+    entry_id = req.entry_id
+    recipients = req.recipients
     if not entry_id or not recipients:
-        return jsonify({"error": "entry_id and recipients are required"}), 400
+        raise HTTPException(status_code=400, detail="entry_id and recipients are required")
     with get_connection() as conn:
         cur = conn.execute("SELECT shared_to FROM journal_entries WHERE id = ?", (entry_id,))
         row = cur.fetchone()
         if row is None:
-            return jsonify({"error": "Entry not found"}), 404
+            raise HTTPException(status_code=404, detail="Entry not found")
         current_recipients = json.loads(row["shared_to"] or "[]")
         for r in recipients:
             if r not in current_recipients:
@@ -265,18 +298,18 @@ def share() -> Any:
             (json.dumps(current_recipients), entry_id),
         )
         conn.commit()
-    return jsonify({"status": "shared"})
+    return {"status": "shared"}
 
-@app.route("/users/<user_id>/streak", methods=["GET"])
-def get_streak(user_id: str) -> Any:
+@app.get("/users/{user_id}/streak")
+async def get_streak(user_id: str):
     with get_connection() as conn:
         cur = conn.execute("SELECT streak_count FROM users WHERE user_id = ?", (user_id,))
         row = cur.fetchone()
     streak = row["streak_count"] if row else 0
-    return jsonify({"streak_count": streak})
+    return {"streak_count": streak}
 
-@app.route("/users", methods=["GET"])
-def get_user() -> Any:
+@app.get("/users")
+async def get_user():
     with get_connection() as conn:
         cur = conn.execute("SELECT * FROM users ")
         cur_rows = cur.fetchall()
@@ -287,11 +320,10 @@ def get_user() -> Any:
             "streak_count": row["streak_count"],
             "last_entry_date": row["last_entry_date"]
         })
+    return {"result": users}
 
-    return jsonify({"result": users})
-
-@app.route("/users/<user_id>", methods=["POST"])
-def create_user(user_id: str) -> Any:
+@app.post("/users/{user_id}", status_code=201)
+async def create_user(user_id: str):
     with get_connection() as conn:
         cur = conn.execute(
             "INSERT OR IGNORE INTO users (user_id, streak_count, last_entry_date) VALUES (?, 0, NULL)",
@@ -299,112 +331,90 @@ def create_user(user_id: str) -> Any:
         )
         conn.commit()
     if cur.rowcount == 0:
-        return jsonify({"error": "User already exists"}), 400
-    return jsonify({"status": "created"}), 201
+        raise HTTPException(status_code=400, detail="User already exists")
+    return {"status": "created"}
 
-@app.route("/users/get/<user_id>", methods=["GET"])
-def get_user_byid(user_id: str) -> Any:
+@app.get("/users/get/{user_id}")
+async def get_user_byid(user_id: str):
     with get_connection() as conn:
         cur = conn.execute(
             "SELECT * FROM users WHERE user_id = ?", (user_id,)
         )
         cur = cur.fetchone()
-
     if cur is None:
-        return jsonify({"error": "User not found"}), 404
+        raise HTTPException(status_code=404, detail="User not found")
     user_data = {
         "user_id": cur["user_id"],
         "streak_count": cur["streak_count"],
         "last_entry_date": cur["last_entry_date"]
     }
-    return jsonify({"res": user_data})
+    return {"res": user_data}
 
-
-@app.route("/genius/generate", methods=["GET"])
-def genius_generate() -> Any:
-    user_id = request.args.get("user_id")
+@app.get("/genius/generate")
+async def genius_generate(user_id: str = Query(...)):
     if not user_id:
-        return jsonify({"error": "user_id is required"}), 400
+        raise HTTPException(status_code=400, detail="user_id is required")
     global text
-
     with get_connection() as conn:
         cur = conn.execute("SELECT * FROM journal_entries WHERE user_id = ?", (user_id,))
         row = cur.fetchone()
     if row is None:
-        return jsonify({"error": "Entry not found"}), 404
-   
+        raise HTTPException(status_code=404, detail="Entry not found")
     text = row["text"]
     if not text:
-        return jsonify({"error": "No text found in entry"}), 400
-
-    
+        raise HTTPException(status_code=400, detail="No text found in entry")
     from backend.lib.matcher import match
     from backend.lib.semantics import ana
+    result = match(text, ana)
+    return {"result": result}
 
-    result = match(text, ana)   
-    return jsonify({"result": result})
-
-
-@app.route("/session/create/<user_id>", methods=["GET"])
-def create_session(user_id: str) -> Any:
-
+@app.get("/session/create/{user_id}", status_code=201)
+async def create_session(user_id: str):
     if not user_id:
-        return jsonify({"error": "user_id is required"}), 400
+        raise HTTPException(status_code=400, detail="user_id is required")
     with get_connection() as conn:
         cur = conn.execute(
             "SELECT * from sessions where user_id = ?", (user_id,))
         existing_session = cur.fetchone()
-
-
     with get_connection() as conn:
         cur = conn.execute(
             "INSERT INTO sessions (user_id, currentDate, expiryDate) VALUES (?,?,?)", (user_id, datetime.utcnow().isoformat(), (datetime.utcnow() + timedelta(days=30)).isoformat()))
-
         conn.commit()
-
-    return jsonify({"status": "session created", "session": {
+    return {"status": "session created", "session": {
         "user_id": user_id,
         "currentDate": datetime.utcnow().isoformat(),
         "expiryDate": (datetime.utcnow() + timedelta(days=30)).isoformat()
-    }}), 201
+    }}
 
-
-@app.route("/session/validate/<user_id>", methods=["GET"])
-def validate_session(user_id: str) -> Any:
+@app.get("/session/validate/{user_id}")
+async def validate_session(user_id: str):
     if not user_id:
-        return jsonify({"error": "user_id is required"}), 400
+        raise HTTPException(status_code=400, detail="user_id is required")
     with get_connection() as conn:
         cur = conn.execute(
             "SELECT * from sessions where user_id = ?", (user_id,))
         session = cur.fetchone()
     if not session:
-        return jsonify({"error": "Session not found"}), 404
-    
+        raise HTTPException(status_code=404, detail="Session not found")
     current_date = datetime.utcnow()
     expiry_date = datetime.fromisoformat(session["expiryDate"])
-
     if current_date > expiry_date:
-        return jsonify({"error": "Session expired"}), 403
-
-    return jsonify({"status": "session valid", "session": {
+        raise HTTPException(status_code=403, detail="Session expired")
+    return {"status": "session valid", "session": {
         "user_id": session["user_id"],
         "currentDate": session["currentDate"],
         "expiryDate": session["expiryDate"]
-    }}), 200
+    }}
 
-@app.route("/session/delete/<user_id>", methods=["GET"])
-def delete_session(user_id: str) -> Any:
+@app.get("/session/delete/{user_id}")
+async def delete_session(user_id: str):
     if not user_id:
-        return jsonify({"error": "user_id is required"}), 400
+        raise HTTPException(status_code=400, detail="user_id is required")
     with get_connection() as conn:
         cur = conn.execute(
             "DELETE FROM sessions WHERE user_id = ?", (user_id,))
         if cur.rowcount == 0:
-            return jsonify({"error": "Session not found"}), 404
+            raise HTTPException(status_code=404, detail="Session not found")
         conn.commit()
-    return jsonify({"status": "session deleted"}), 200
+    return {"status": "session deleted"}
 
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5001))
-    app.run(host="0.0.0.0", port=port, debug=True)
