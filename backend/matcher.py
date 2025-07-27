@@ -109,7 +109,6 @@ def get_popular_songs_by_emotion(emotion, sentiment, tok):
     return all_tracks[:30]
 
     
-
 def match(txt, ana_fn):
     res = ana_fn(txt)
     
@@ -120,54 +119,58 @@ def match(txt, ana_fn):
     popular_tracks = get_popular_songs_by_emotion(res["emotion"], res["sentiment"], s_tok)
     
     journal_words = set(word.lower() for word in res["tokens"] if len(word) > 3)
-    keywords_lower = [kw.lower() for kw in res["keywords"][:3]]
+    keywords = [kw.lower() for kw in res["keywords"]]
+    emotion = res["emotion"].lower()
+    sentiment = res["sentiment"].lower()
     
     scored_tracks = []
-    
+
     for track in popular_tracks:
         score = 0
+        title = track["title"].lower()
+        artist = track["artist"].lower()
 
-        title_lower = track["title"].lower()
-        artist_lower = track["artist"].lower()
-        
-        pop_score = int((track["popularity"] / 100) * 20)
-        score += pop_score
+        score += int((track["popularity"] / 100) * 15)
 
-        for keyword in keywords_lower:
-            if keyword in title_lower:
-                score += 25
-            if keyword in artist_lower:
-                score += 15
+        for kw in keywords:
+            if kw in title:
+                score += 10
+            if kw in artist:
+                score += 5
 
         genius_hits = g_search(f"{track['title']} {track['artist']}")
-        if genius_hits:
-            lyrics = get_lyrics(genius_hits[0][2])
-            if lyrics:
-                lyrics_lower = lyrics.lower()
-                
-                if res["emotion"].lower() in lyrics_lower:
-                    score += 80
-                if res["sentiment"].lower() in lyrics_lower:
-                    score += 20
+        lyrics = get_lyrics(genius_hits[0][2]) if genius_hits else ""
+        lyrics_lower = lyrics.lower()
 
-                lyrics_words = set(re.findall(r'\b\w{4,}\b', lyrics_lower))
-                overlap = len(journal_words & lyrics_words)
-                score += overlap * 4
+        if lyrics:
+       
+            if emotion in lyrics_lower:
+                score += 20
+            if sentiment in lyrics_lower:
+                score += 10
+            for kw in keywords:
+                if kw in lyrics_lower:
+                    score += 5
+
+            lyrics_words = set(re.findall(r'\b\w{4,}\b', lyrics_lower))
+            if lyrics_words:
+                common = journal_words & lyrics_words
+                union = journal_words | lyrics_words
+                jaccard = len(common) / len(union) if union else 0
+                score += int(jaccard * 20)
 
         scored_tracks.append((track, score))
-    
+
     scored_tracks.sort(key=lambda x: x[1], reverse=True)
     top_tracks = scored_tracks[:15]
-    
+
     if not top_tracks:
         return "No songs found for your mood."
     
     result = f"Songs matching your journal entry:\n\n"
-    
     for i, (track, score) in enumerate(top_tracks, 1):
         result += f"{i}. {track['title']} by {track['artist']}\n"
         result += f"   {track['link']}\n"
-        result += f"   Popularity: {track['popularity']}/100\n\n"
 
     return result.strip()
 
