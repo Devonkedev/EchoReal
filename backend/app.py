@@ -19,28 +19,53 @@ def init_db() -> None:
     with get_connection() as conn:
         conn.execute(
             """
-            CREATE TABLE IF NOT EXISTS journal_entries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id TEXT NOT NULL,
-                timestamp TEXT NOT NULL,
-                mood TEXT NOT NULL,
-                mood_intensity INTEGER,
-                text TEXT NOT NULL,
-                spotify_track_id TEXT,
-                shared_to TEXT,
-                liked_tracks TEXT
+            CREATE TABLE auth_data (
+                user_id TEXT PRIMARY KEY,
+                email TEXT,
+                password TEXT
+            );
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE users (
+                user_id TEXT PRIMARY KEY,
+                streak_count INTEGER,
+                last_entry_date TEXT,
+                FOREIGN KEY (user_id) REFERENCES auth_data(user_id) ON DELETE CASCADE
+);
             )
             """
         )
         conn.execute(
             """
-            CREATE TABLE IF NOT EXISTS users (
-                user_id TEXT PRIMARY KEY,
-                streak_count INTEGER,
-                last_entry_date TEXT
-            )
+            CREATE TABLE journal_entries (
+                id INTEGER PRIMARY KEY,
+                user_id TEXT,
+                timestamp TEXT,
+                mood TEXT,
+                mood_intensity INTEGER,
+                text TEXT,
+                spotify_track_id TEXT,
+                shared_to TEXT,
+                liked_tracks TEXT,
+                FOREIGN KEY (user_id) REFERENCES auth_data(user_id) ON DELETE CASCADE
+            );
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE sessions (
+                id INTEGER PRIMARY KEY,
+                user_id TEXT,
+                currentDate TEXT,
+                expiryDate TEXT,
+                FOREIGN KEY (user_id) REFERENCES auth_data(user_id) ON DELETE CASCADE
+);
+            """
+        )
+
+
         conn.commit()
 
 def parse_date(date_str: str) -> datetime.date:

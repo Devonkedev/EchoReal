@@ -1,0 +1,37 @@
+
+CREATE TABLE auth_data (
+    user_id TEXT PRIMARY KEY,
+    email TEXT,
+    password TEXT
+);
+
+
+CREATE TABLE users (
+    user_id TEXT PRIMARY KEY,
+    streak_count INTEGER,
+    last_entry_date TEXT,
+    FOREIGN KEY (user_id) REFERENCES auth_data(user_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE journal_entries (
+    id INTEGER PRIMARY KEY,
+    user_id TEXT,
+    timestamp TEXT,
+    mood TEXT,
+    mood_intensity INTEGER,
+    text TEXT,
+    spotify_track_id TEXT,
+    shared_to TEXT,
+    liked_tracks TEXT,
+    FOREIGN KEY (user_id) REFERENCES auth_data(user_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE sessions (
+    id INTEGER PRIMARY KEY,
+    user_id TEXT,
+    currentDate TEXT,
+    expiryDate TEXT,
+    FOREIGN KEY (user_id) REFERENCES auth_data(user_id) ON DELETE CASCADE
+);

@@ -1,7 +1,15 @@
 ---
+import Entry from "../components/Entry.astro";
 import Layout from "../layouts/Layout.astro";
 
+const entries = await fetch("http://127.0.0.1:5001/journal/entries?user_id=aanvi")
+  .then((res) => res.json())
+  .catch((err) => {
+	console.error("Error fetching entries:", err);
+	return [];
+  });
 
+console.log("Fetched entries:", entries[1]);
 ---
 
 <Layout
@@ -9,4 +17,9 @@ import Layout from "../layouts/Layout.astro";
   description="Welcome to our homepage. Explore our content and learn more about what we offer."
 >
 <div class="text-xl">
-</Layout>
+	  <h1 class="text-3xl font-bold mb-4">Welcome to Our Homepage</h1>
+  <p class="mb-4">Explore our content and learn more about what we offer.</p>
+
+  <Entry entries={entries} />
+
+</Layout> 

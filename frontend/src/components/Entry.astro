@@ -1,0 +1,14 @@
+---
+
+
+const { entries } = Astro.props;
+
+---
+
+<ul>
+	{entries.map((entry: { entry_id: any; timestamp: unknown; text: unknown; }) => (
+	  <li key={entry.entry_id} class="mb-2">
+		<strong>{entry.timestamp}</strong>: {entry.text}
+	  </li>
+	))}
+  </ul>
