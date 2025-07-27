@@ -1,6 +1,14 @@
 ---
 const { title = "Echo Journal" } = Astro.props;
 
+const nav = [
+  { name: "Dashboard", icon: "fas fa-chart-line", link: "/" },
+  { name: "Journal", icon: "fas fa-book-open", link: "/journal" },
+  { name: "Music Healing", icon: "fas fa-music", link: "/music" },
+  { name: "Friends", icon: "fas fa-user-friends", link: "/friends" },
+  { name: "Profile", icon: "fas fa-cog", link: "/profile" }
+];
+
 ---
 
 <html lang="en">
@@ -12,32 +20,24 @@ const { title = "Echo Journal" } = Astro.props;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   </head>
   <body class="flex">
-	<aside class="w-64 bg-white border-r flex flex-col justify-between">
+	<aside class="max-w-fit min-w-64 bg-white border-r h-screen *:flex flex-col justify-between">
         <div>
           <div class="flex items-center px-6 py-4 text-2xl font-semibold border-b">
-            <i class=""></i> Echo
+            <i class=""></i> <img src="vrindavij.gif" alt="Echo Journal Logo" class="w-8 h-8 mr-2"/>
           </div>
-          <nav class="mt-4 ">
+          <nav class="mt-4">
             <ul>
-              <li class="px-6 py-3 bg-gray-100 text-gray-900 font-medium">
-                <i class="fas fa-chart-line mr-2"></i> Dashboard
+            {nav.map ((item) => (
+            <a href={item.link} class="block">
+              <li class={`px-6 py-3 hover:bg-gray-100 cursor-pointer ${item.link === Astro.url.pathname ? 'bg-gray-200 font-semibold' : ''}`}>
+                <i class={`${item.icon} mr-2`}></i> {item.name}
               </li>
-              <li class="px-6 py-3 hover:bg-gray-100 cursor-pointer">
-                <i class="fas fa-book-open mr-2"></i> Journal
-              </li>
-              <li class="px-6 py-3 hover:bg-gray-100 cursor-pointer">
-                <i class="fas fa-music mr-2"></i> Music Healing
-              </li>
-              <li class="px-6 py-3 hover:bg-gray-100 cursor-pointer">
-                <i class="fas fa-user-friends mr-2"></i> Friends
-              </li>
-              <li class="px-6 py-3 hover:bg-gray-100 cursor-pointer">
-                <i class="fas fa-cog mr-2"></i> Profile
-              </li>
-            </ul>
+            </a>)
+)}
+              
           </nav>
         </div>
-        <div class="px-6 py-4 border-t flex items-center space-x-2">
+        <div class="px-6 py-4 border-t flex items-center align-bottom space-x-2 bottom-0">
           <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-semibold">S</div>
           <div>
             <p class="text-sm font-medium">s</p>
