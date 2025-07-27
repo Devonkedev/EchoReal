@@ -344,6 +344,9 @@ def genius_generate() -> Any:
     result = match(text, ana)   
     return jsonify({"result": result})
 
+"""
+Below is the code for session management CRUD
+"""
 
 @app.route("/session/create/<user_id>", methods=["GET"])
 def create_session(user_id: str) -> Any:
