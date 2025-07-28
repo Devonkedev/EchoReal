@@ -1,440 +1,135 @@
 ---
-
-import Layout from "../layouts/Layout.astro";
+import Layout from "../layouts/Layout.astro"
 
 const title = "Profile & Settings - Echo Journal"
+
 const user = {
-  name: "shayan labubu",
-  email: "shayan@labubu.com",
-  avatar: "SL"
-};
+  name: "Sarah Johnson",
+  email: "sarah@echo.com",
+  avatar: "S"
+}
 
 const settingsCategories = [
   {
     id: "general",
-    title: "Settings",
+    title: "General Settings",
     icon: "fas fa-cog",
     items: [
-      {
-        id: "darkMode",
-        title: "Dark Mode",
-        description: "Switch between light and dark themes",
-        type: "toggle",
-        defaultValue: false
-      },
-      {
-        id: "privateJournal",
-        title: "Private Journal",
-        description: "Make your journal entries private",
-        type: "toggle",
-        defaultValue: true
-      },
-      {
-        id: "autoSave",
-        title: "Auto-Save",
-        description: "Automatically save your work",
-        type: "toggle",
-        defaultValue: true
-      }
+      { key: "darkMode", label: "Dark Mode", value: true },
+      { key: "notifications", label: "Notifications", value: false }
     ]
   },
   {
-    id: "notifications",
-    title: "Notifications",
-    icon: "fas fa-bell",
+    id: "account",
+    title: "Account Settings",
+    icon: "fas fa-user",
     items: [
-      {
-        id: "dailyReminders",
-        title: "Daily Reminders",
-        description: "Get reminded to write in your journal",
-        type: "toggle",
-        defaultValue: true
-      },
-      {
-        id: "musicNotifs",
-        title: "Music Recommendations",
-        description: "Get notified about new healing music",
-        type: "toggle",
-        defaultValue: false
-      },
-      {
-        id: "reminderTime",
-        title: "Reminder Time",
-        description: "Set your preferred reminder time",
-        type: "time",
-        defaultValue: "20:00"
-      }
+      { key: "showEmail", label: "Show Email", value: true },
+      { key: "profilePublic", label: "Make Profile Public", value: false }
     ]
   }
-];
+]
 
 const helpItems = [
   {
-    title: "User Guide",
-    description: "Learn how to use Echo Journal",
-    icon: "fas fa-book",
-    color: "blue",
-    action: "userGuide"
-  },
-  {
     title: "Contact Support",
-    description: "Get help from our team",
+    description: "Reach out to our team for help or questions.",
     icon: "fas fa-envelope",
-    color: "green",
-    action: "contactSupport"
+    color: "text-blue-600 bg-blue-50 dark:text-blue-200 dark:bg-blue-800"
   },
   {
-    title: "Community",
-    description: "Connect with other users",
-    icon: "fas fa-comments",
-    color: "purple",
-    action: "community"
+    title: "FAQs",
+    description: "Find answers to common questions about Echo.",
+    icon: "fas fa-question",
+    color: "text-green-600 bg-green-50 dark:text-green-200 dark:bg-green-800"
   },
   {
-    title: "Report Bug",
-    description: "Help us improve the app",
-    icon: "fas fa-bug",
-    color: "orange",
-    action: "reportBug"
+    title: "Privacy Policy",
+    description: "Understand how we protect your data.",
+    icon: "fas fa-lock",
+    color: "text-purple-600 bg-purple-50 dark:text-purple-200 dark:bg-purple-800"
+  },
+  {
+    title: "Give Feedback",
+    description: "Help us improve by sharing your thoughts.",
+    icon: "fas fa-comment-dots",
+    color: "text-orange-600 bg-orange-50 dark:text-orange-200 dark:bg-orange-800"
   }
-];
+]
 
-const colorClasses = {
-  blue: {
-    bg: "bg-blue-50 hover:bg-blue-100",
-    text: "text-blue-600"
-  },
-  green: {
-    bg: "bg-green-50 hover:bg-green-100",
-    text: "text-green-600"
-  },
-  purple: {
-    bg: "bg-purple-50 hover:bg-purple-100",
-    text: "text-purple-600"
-  },
-  orange: {
-    bg: "bg-orange-50 hover:bg-orange-100",
-    text: "text-orange-600"
-  }
-};
+let toast = null
 
+function applySetting(key, value) {
+  toast = `Updated "${key}" to ${value ? "enabled" : "disabled"}`
+  setTimeout(() => {
+    toast = null
+  }, 3000)
+}
+
+function handleHelpAction(action) {
+  toast = `Clicked "${action}"`
+  setTimeout(() => {
+    toast = null
+  }, 3000)
+}
 ---
+<Layout title={title}>
+  <div class="max-w-5xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Settings</h1>
 
-<Layout>
-  <style>
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 48px;
-      height: 24px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: 0.4s;
-      border-radius: 24px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: 0.4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background-color: #4f46e5;
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(24px);
-    }
-  </style>
-  <div class="max-w-4xl mx-auto p-8">
-    <!-- Profile Header -->
-    <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
-      <div class="flex items-center space-x-4 mb-6">
-        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-          {user.avatar}
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900 flex items-center">
-            <i class="fas fa-user mr-3"></i>Profile
-          </h1>
-          <p class="text-gray-600">Manage your account and preferences</p>
-        </div>
-      </div>
-
-      <!-- Profile Form -->
-      <form id="profileForm" class="space-y-4">
-        <div class="grid md:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-            <input 
-              type="text" 
-              id="fullName" 
-              name="fullName"
-              defaultValue={user.name} 
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input 
-              type="email" 
-              id="email" 
-              name="email"
-              defaultValue={user.email} 
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          Save Changes
-        </button>
-      </form>
-    </div>
-
-    <!-- Settings -->
-    {settingsCategories.map((category) => (
-      <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-          <i class={`${category.icon} mr-3`}></i>{category.title}
-        </h2>
-        <div class="space-y-6">
-          {category.items.map((item) => (
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div>
-                <h3 class="font-medium text-gray-900">{item.title}</h3>
-                <p class="text-sm text-gray-600">{item.description}</p>
-              </div>
-
-              {item.type === 'toggle' ? (
-                <label class="relative inline-flex items-center cursor-pointer">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- SETTINGS -->
+      <div class="space-y-6">
+        {settingsCategories.map((category) => (
+          <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center mb-4">
+              <i class={`${category.icon} mr-2`}></i> {category.title}
+            </h2>
+            <ul class="space-y-3">
+              {category.items.map((item) => (
+                <li class="flex justify-between items-center">
+                  <span class="text-gray-800 dark:text-gray-300">{item.label}</span>
                   <input 
                     type="checkbox" 
-                    id={item.id}
-                    data-setting={item.id}
-                    checked={item.defaultValue}
-                    class="sr-only peer"
+                    checked={item.value}
+                    class="toggle"
+                    onChange={(e) => applySetting(item.key, e.currentTarget.checked)}
                   />
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-              ) : item.type === 'time' ? (
-                <input 
-                  type="time" 
-                  id={item.id}
-                  data-setting={item.id}
-                  value={item.defaultValue}
-                  class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              ) : null}
-            </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <!-- HELP & SUPPORT -->
+      <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+          <i class="fas fa-question-circle mr-2"></i> Help & Support
+        </h2>
+        <div class="grid gap-4">
+          {helpItems.map((item) => (
+            <button
+              class={`flex items-start gap-4 p-4 rounded-lg transition hover:shadow-md ${item.color}`}
+              onClick={() => handleHelpAction(item.title)}
+            >
+              <div class="text-2xl mt-1">
+                <i class={item.icon}></i>
+              </div>
+              <div class="text-left">
+                <h3 class="font-semibold text-gray-900 dark:text-white">{item.title}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
+              </div>
+            </button>
           ))}
         </div>
       </div>
-    ))}
-
-    <!-- Help & Support -->
-    <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
-      <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-        <i class="fas fa-question-circle mr-3"></i>Help & Support
-      </h2>
-      <div class="grid md:grid-cols-2 gap-4">
-        {helpItems.map((item) => (
-          <button 
-            class={`p-4 ${colorClasses[item.color].bg} rounded-lg text-left transition-colors`}
-            data-action={item.action}
-          >
-            <i class={`${item.icon} ${colorClasses[item.color].text} mb-2`}></i>
-            <h3 class="font-medium text-gray-900">{item.title}</h3>
-            <p class="text-sm text-gray-600">{item.description}</p>
-          </button>
-        ))}
-      </div>
     </div>
 
-    <!-- Account Actions -->
-    <div class="bg-white rounded-xl shadow-sm p-8">
-      <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-        <i class="fas fa-sign-out-alt mr-3 text-red-600"></i>Account Actions
-      </h2>
-      <div class="flex flex-col sm:flex-row gap-4">
-        <button id="logoutBtn" class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center">
-          <i class="fas fa-sign-out-alt mr-2"></i>Log Out
-        </button>
-        <button id="exportBtn" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-          Export Data
-        </button>
-        <button id="deleteBtn" class="px-6 py-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
-          Delete Account
-        </button>
+    {toast && (
+      <div class="fixed bottom-6 right-6 bg-gray-900 text-white px-4 py-2 rounded shadow-lg z-50">
+        {toast}
       </div>
-    </div>
+    )}
   </div>
-
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full transition-transform duration-300">
-    <i class="fas fa-check mr-2"></i>
-    <span id="toastMessage">Settings saved successfully!</span>
-  </div>
-
-  <script>
-    class SettingsManager {
-      constructor() {
-        this.settings = this.loadSettings();
-        this.init();
-      }
-
-      init() {
-        this.bindEvents();
-        this.applySettings();
-      }
-
-      loadSettings() {
-        const saved = localStorage.getItem('echoSettings');
-        return saved ? JSON.parse(saved) : {};
-      }
-
-      saveSettings() {
-        localStorage.setItem('echoSettings', JSON.stringify(this.settings));
-      }
-
-      bindEvents() {
-        document.getElementById('profileForm')?.addEventListener('submit', (e) => {
-          e.preventDefault();
-          this.saveProfile();
-        });
-
-        document.querySelectorAll('[data-setting]').forEach(element => {
-          element.addEventListener('change', (e) => {
-            const settingKey = e.target.dataset.setting;
-            const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-            this.settings[settingKey] = value;
-            this.saveSettings();
-            this.applySetting(settingKey, value);
-            this.showToast(`${settingKey} updated`);
-          });
-        });
-
-        document.querySelectorAll('[data-action]').forEach(button => {
-          button.addEventListener('click', () => {
-            const action = button.dataset.action;
-            this.handleHelpAction(action);
-          });
-        });
-
-        document.getElementById('logoutBtn')?.addEventListener('click', () => this.logout());
-        document.getElementById('exportBtn')?.addEventListener('click', () => this.exportData());
-        document.getElementById('deleteBtn')?.addEventListener('click', () => this.deleteAccount());
-      }
-
-      applySettings() {
-        Object.keys(this.settings).forEach(key => {
-          this.applySetting(key, this.settings[key]);
-          const element = document.querySelector(`[data-setting="${key}"]`);
-          if (element) {
-            if (element.type === 'checkbox') {
-              element.checked = this.settings[key];
-            } else {
-              element.value = this.settings[key];
-            }
-          }
-        });
-      }
-
-      applySetting(key: string, value: boolean | undefined) {
-        if (key === 'darkMode') {
-          document.body.classList.toggle('dark', value);
-        }
-      }
-
-      saveProfile() {
-        const formData = new FormData(document.getElementById('profileForm'));
-        const profile = Object.fromEntries(formData);
-        localStorage.setItem('userProfile', JSON.stringify(profile));
-        this.showToast('Profile updated successfully!');
-      }
-
-      handleHelpAction(action: string | number) {
-        const actions = {
-          userGuide: () => window.open('/help/user-guide', '_blank'),
-          contactSupport: () => window.open('mailto:support@echo.com'),
-          community: () => window.open('/community', '_blank'),
-          reportBug: () => window.open('/help/report-bug', '_blank')
-        };
-
-        if (actions[action]) actions[action]();
-        else this.showToast(`Opening ${action}...`);
-      }
-
-      async logout() {
-        if (!confirm('Are you sure you want to log out?')) return;
-        const btn = document.getElementById('logoutBtn');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging out...';
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.href = '/login';
-      }
-
-      exportData() {
-        const data = {
-          profile: JSON.parse(localStorage.getItem('userProfile') || '{}'),
-          settings: this.settings,
-          exportDate: new Date().toISOString()
-        };
-
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'echo-journal-data.json';
-        a.click();
-        URL.revokeObjectURL(url);
-        this.showToast('Data exported successfully!');
-      }
-
-      deleteAccount() {
-        const confirmation = prompt('Type "DELETE" to permanently delete your account:');
-        if (confirmation === 'DELETE') {
-          this.showToast('Account deletion requested. Check your email for confirmation.');
-        }
-      }
-
-      showToast(message: string | null) {
-        const toast = document.getElementById('toast');
-        const messageEl = document.getElementById('toastMessage');
-        if (toast && messageEl) {
-          messageEl.textContent = message;
-          toast.classList.remove('translate-y-full');
-          setTimeout(() => {
-            toast.classList.add('translate-y-full');
-          }, 3000);
-        }
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      new SettingsManager();
-    });
-  </script>
 </Layout>
