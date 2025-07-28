@@ -1,6 +1,15 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
+const playlist = await fetch("http://localhost:8000/genius/create" + new URLSearchParams({
+  "user_id": "aanvi"
+}), {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json"
+  }
+}).then(res => res.json());
+
 const playlists = [
   {
     id: 1,
