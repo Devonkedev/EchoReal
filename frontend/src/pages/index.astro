@@ -2,57 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<div id="songModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
-  <div class="bg-white rounded-2xl shadow-lg w-[90%] max-w-md p-6">
-    <h2 class="text-xl font-semibold mb-4 text-gray-800">Song Matches</h2>
-    <ul class="space-y-3 text-sm text-gray-700">
-      <li>
-        <a href="https://open.spotify.com/track/1JvTaTBb5pzKHRWD3Ddj89" target="_blank" class="block p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
-          <strong>Feel Good</strong>  YoungBoy Never Broke Again
-        </a>
-      </li>
-      <li>
-        <a href="https://open.spotify.com/track/6snoOAATGyud5oaIT9gwws" target="_blank" class="block p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
-          <strong>The Happy Song</strong>  Imogen Heap
-        </a
-      </li>
-      <li>
-        <a href="https://open.spotify.com/track/65wzicJctsW9GwnTnLWxQO2" target="_blank" class="block p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
-          <strong>GOOD FEELiNGS</strong>  Coldplay
-        </a>
-      </li>
-    </ul>
-    <div class="mt-6 text-right">
-      <button class="text-blue-600 font-medium hover:underline">See More</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Script -->
-<script type="module">
-  const saveBtn = document.querySelector('button.bg-blue-600');
-  const modal = document.getElementById('songModal');
-  
-  saveBtn?.addEventListener('click', () => {
-    modal.classList.remove('hidden');
-  });
-
-  // Optional: click outside to close
-  modal?.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.add('hidden');
-    }
-  });
-</script>
-
 <Layout title="Dashboard - Echo Journal">
   <div class="p-8">
- 
     <div class="mb-8">
       <h1 class="text-3xl font-semibold mb-2">Welcome back! </h1>
       <p class="text-gray-600">How are you feeling today?</p>
     </div>
-
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div class="bg-white rounded-xl shadow-sm p-6 border">
@@ -75,57 +30,42 @@ import Layout from '../layouts/Layout.astro';
     <div class="bg-white rounded-xl shadow-sm p-6 border mb-8">
       <h2 class="text-xl font-semibold mb-4">Journal Entry</h2>
       <p class="text-gray-600 mb-6">How are you feeling today?</p>
-      
- 
+
       <div class="mb-8">
         <h3 class="text-lg font-medium mb-4">Select Your Mood</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button class="flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-            <span class="text-2xl mb-2"></span>
+        <div id="moodButtons" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="happy">
             <span class="text-sm font-medium">Happy</span>
           </button>
-          <button class="flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-            <span class="text-2xl mb-2"></span>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="calm">
             <span class="text-sm font-medium">Calm</span>
           </button>
-          <button class="flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-            <span class="text-2xl mb-2"></span>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="sad">
             <span class="text-sm font-medium">Sad</span>
           </button>
-          <button class="flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-            <span class="text-2xl mb-2"></span>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="frustrated">
             <span class="text-sm font-medium">Frustrated</span>
           </button>
-          <button class="flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-            <span class="text-2xl mb-2"></span>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="tired">
             <span class="text-sm font-medium">Tired</span>
           </button>
-          <button class="flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-            <span class="text-2xl mb-2"></span>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="excited">
             <span class="text-sm font-medium">Excited</span>
           </button>
-          <button class="flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-            <span class="text-2xl mb-2"></span>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="anxious">
             <span class="text-sm font-medium">Anxious</span>
           </button>
-          <button class="flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-            <span class="text-2xl mb-2"></span>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="confident">
             <span class="text-sm font-medium">Confident</span>
           </button>
         </div>
       </div>
 
-
       <div>
         <h3 class="text-lg font-medium mb-4">Write Your Thoughts</h3>
-        <textarea 
-          class="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-          placeholder="What's on your mind today? Share your thoughts, feelings, or experiences..."
-        ></textarea>
+        <textarea id="journalText" class="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="What's on your mind today? Share your thoughts, feelings, or experiences..."></textarea>
         <div class="flex justify-end mt-4">
-          <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Save Entry
-          </button>
+          <button id="generateBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Save Entry</button>
         </div>
       </div>
     </div>
@@ -135,4 +75,81 @@ import Layout from '../layouts/Layout.astro';
       <p class="text-gray-500">No entries yet. Start journaling to see your progress!</p>
     </div>
   </div>
+
+  <div id="songModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+    <div class="bg-white rounded-2xl shadow-lg w-[90%] max-w-md p-6">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Song Matches</h2>
+      <ul id="songList" class="space-y-3 text-sm text-gray-700"></ul>
+      <div class="mt-6 text-right">
+        <button id="closeModalBtn" class="text-blue-600 font-medium hover:underline">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    document.addEventListener("DOMContentLoaded", () => {
+      const generateBtn = document.getElementById("generateBtn");
+      const journalInput = document.getElementById("journalText");
+      const songModal = document.getElementById("songModal");
+      const songList = document.getElementById("songList");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      let selectedMood = null;
+
+      document.querySelectorAll(".mood-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedMood = btn.dataset.mood;
+          document.querySelectorAll(".mood-btn").forEach(b => b.classList.remove("ring", "ring-2", "ring-blue-500"));
+          btn.classList.add("ring", "ring-2", "ring-blue-500");
+        });
+      });
+
+      closeModalBtn.addEventListener("click", () => {
+        songModal.classList.add("hidden");
+      });
+
+      generateBtn.addEventListener("click", async () => {
+        const text = journalInput.value.trim();
+        if (!selectedMood || !text) {
+          alert("Please write something and pick a mood first.");
+          return;
+        }
+
+        const moodIntensity = selectedMood === "happy" ? 3 : selectedMood === "sad" ? 2 : 1;
+
+        const payload = {
+          user_id: "aanvi",
+          mood: selectedMood,
+          text: text,
+          mood_intensity: moodIntensity,
+          spotify_track_id: ""
+        };
+
+        try {
+          const response = await fetch("http://localhost:8000/journal/entries", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json();
+          songList.innerHTML = "";
+          data.tracks.forEach(track => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+              <a href="${track.spotify_link}" target="_blank" class="block p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                <strong>${track.name}</strong> — ${track.artist}
+              </a>`;
+            songList.appendChild(li);
+          });
+
+          songModal.classList.remove("hidden");
+        } catch (err) {
+          console.error("Fetch error:", err);
+          alert("Something went wrong while fetching the songs.");
+        }
+      });
+    });
+  </script>
 </Layout>
