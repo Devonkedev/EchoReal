@@ -1,62 +1,16 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
-const playlists = [
-  {
-    id: 1,
-    name: "Morning Vibes",
-    description: "Perfect for starting your day",
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-    songCount: 24,
-    duration: "1h 32m",
-    lastPlayed: "2 days ago"
-  },
-  {
-    id: 2,
-    name: "Focus Flow",
-    description: "Deep work and concentration",
-    image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=300&fit=crop",
-    songCount: 18,
-    duration: "58m",
-    lastPlayed: "1 week ago"
-  },
-  {
-    id: 3,
-    name: "Chill Evenings",
-    description: "Relaxing tunes for unwinding",
-    image: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400&h=300&fit=crop",
-    songCount: 31,
-    duration: "2h 15m",
-    lastPlayed: "3 days ago"
-  },
-  {
-    id: 4,
-    name: "Workout Energy",
-    description: "High-energy tracks for exercise",
-    image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
-    songCount: 27,
-    duration: "1h 48m",
-    lastPlayed: "5 days ago"
-  },
-  {
-    id: 5,
-    name: "Study Sessions",
-    description: "Instrumental and ambient sounds",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
-    songCount: 22,
-    duration: "1h 23m",
-    lastPlayed: "1 week ago"
-  },
-  {
-    id: 6,
-    name: "Road Trip Mix",
-    description: "Adventures and good times",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
-    songCount: 35,
-    duration: "2h 42m",
-    lastPlayed: "2 weeks ago"
-  }
-];
+const response = await fetch(`http://localhost:8000/genius/generate?userid=${encodeURIComponent("aanvi")}`);
+let playlists = [];
+
+try {
+  const data = await response.json();
+  playlists = data.playlists || []; // or adjust based on what your backend returns
+} catch (error) {
+  console.error("Fetch failed:", error);
+}
+
 ---
 
 <Layout>
