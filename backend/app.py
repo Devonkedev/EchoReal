@@ -5,17 +5,17 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-from fastapi import Response
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+from fastapi import Response  #type: ignore
+from flask import Flask, jsonify, request  #type: ignore
+from flask_cors import CORS  #type: ignore
 
-from fastapi import FastAPI, HTTPException, Request, Query, Body
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from typing import Any, Dict, List, Optional
-from pydantic import BaseModel
-import asyncio
-import uvicorn
+from fastapi import FastAPI, HTTPException, Request, Query, Body  #type: ignore
+from fastapi.middleware.cors import CORSMiddleware #type: ignore
+from fastapi.responses import JSONResponse #type: ignore
+from typing import Any, Dict, List, Optional #type: ignore
+from pydantic import BaseModel #type: ignore
+import asyncio #type: ignore
+import uvicorn #type: ignore
 
 
 class LoginRequest(BaseModel):
@@ -590,3 +590,4 @@ async def delete_user(user_id: str):
             raise HTTPException(status_code=404, detail="User not found")
         conn.commit()
     return {"status": "deleted"}
+
