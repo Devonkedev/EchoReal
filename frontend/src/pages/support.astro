@@ -1,0 +1,69 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Support - Echo Journal">
+  <div class="max-w-4xl mx-auto py-10 px-4">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Contact Support</h1>
+      <p class="text-gray-600 dark:text-gray-300">Need help? We're here for you. Reach out to our support team.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+        <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Send us a message</h2>
+        <form class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
+            <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+            <input type="email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject</label>
+            <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
+            <textarea rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+            Send Message
+          </button>
+        </form>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+          <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Quick Contact</h3>
+          <div class="space-y-3">
+            <div class="flex items-center">
+              <i class="fas fa-envelope text-blue-600 mr-3"></i>
+              <span class="text-gray-700 dark:text-gray-300">support@echo.com</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-phone text-blue-600 mr-3"></i>
+              <span class="text-gray-700 dark:text-gray-300">+91 8800871755</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-clock text-blue-600 mr-3"></i>
+              <span class="text-gray-700 dark:text-gray-300">Mon-Fri, 9AM-6PM IST</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+          <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Common Issues</h3>
+          <ul class="space-y-2">
+            <li><a href="/faqs" class="text-blue-600 hover:underline">Login Problems</a></li>
+            <li><a href="/faqs" class="text-blue-600 hover:underline">Data Sync Issues</a></li>
+            <li><a href="/faqs" class="text-blue-600 hover:underline">Account Settings</a></li>
+            <li><a href="/faqs" class="text-blue-600 hover:underline">Privacy Concerns</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

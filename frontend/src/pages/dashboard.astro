@@ -1,12 +1,13 @@
 ---
 import type { typecast } from 'astro:schema';
 import Layout from '../layouts/Layout.astro';
+const userId = Astro.cookies.get('user_id')?.value;
 
+'client:load';
 
+console.log("User ID:", userId);
 
-
-
-const streak = await fetch(`http://localhost:8000/users/${Astro.cookies.get('user_id')}/streak`).then(res => res.json()).then(data => data.streak_count || 0);
+const streak = await fetch(`http://localhost:8000/users/${userId}/streak`).then(res => res.json()).then(data => data.streak_count);
 
 ---
 
@@ -126,9 +127,9 @@ const streak = await fetch(`http://localhost:8000/users/${Astro.cookies.get('use
         }
 
         const moodIntensity = selectedMood === "happy" ? 3 : selectedMood === "sad" ? 2 : 1;
-
+       
         const payload = {
-          user_id: "aanvi",
+          user_id: localStorage.getItem("user_id") || "default_user", // Replace with actual user ID logic
           mood: selectedMood,
           text: text,
           mood_intensity: moodIntensity,

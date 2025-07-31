@@ -1,7 +1,6 @@
 ---
 "use client";
 
-// console.log("Welcome to Echo Journal! Please login to continue.");
   const session = Astro.cookies.get('user_id')?.value;
   if (!session) {
     Astro.redirect('/login');

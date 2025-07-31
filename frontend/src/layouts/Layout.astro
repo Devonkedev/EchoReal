@@ -10,6 +10,7 @@ var user_id = "";
 var email = "No email found";
 
 user_id = Astro.cookies.get('user_id')?.value;
+const user_id_icon = user_id ? user_id.charAt(0).toUpperCase() : "U";
 email = await fetch(`http://localhost:8000/auth/user/${user_id}`)
   .then(res => res.json())
   .then(data => data.email || "No email found");
@@ -63,7 +64,7 @@ email = await fetch(`http://localhost:8000/auth/user/${user_id}`)
         </nav>
       </div>
       <div class="px-6 py-4 border-t flex items-center space-x-2">
-        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-semibold text-white">S</div>
+        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-semibold text-white">{user_id_icon}</div>
         <div>
           <p class="text-sm font-medium" id="name">{user_id}</p>
           <p class="text-xs text-gray-500" id="email">{email}</p>
