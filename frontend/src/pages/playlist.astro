@@ -1,17 +1,22 @@
 ---
+import { coerce } from "astro:schema";
 import Layout from "../layouts/Layout.astro";
+'use client';
 
-const playlist = await fetch("http://localhost:8000/genius/create" + new URLSearchParams({
-  "user_id": "aanvi"
-}), {
-  method: "GET",
-  headers: {
-    "Content-Type": "application/json"
+async function fetchData() {
+  try {
+    console.log('loading.....');
+    const response = await fetch('http://localhost:8000/genius/generate?user_id=aanvi');
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const result = await response.json();
+    
+    console.log(result); // Or do something more useful
+  } catch (err) {
+    console.error('Error fetching data:', err);
   }
-}).then(res => res.json());
+}
 
-console.log(playlist);
-const playlists = [
+var playlists = [
   {
     id: 1,
     name: "Morning Vibes",
@@ -86,6 +91,31 @@ const playlists = [
         <h1 class="text-4xl font-extrabold mb-2 tracking-tight">My Playlists</h1>
         <p class="text-lg text-gray-600">Your personal collection of curated music</p>
       </div>
+
+      <button id="generate-btn" >
+        Generate from Genius
+      </button>
+      <pre id="output" class="bg-gray-100 p-4 rounded-lg mt-4"></pre>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const button = document.getElementById('generate-btn');
+            const output = document.getElementById('output');
+  
+            button.addEventListener('click', async () => {
+            output.textContent = "Loading...";
+  
+            try {
+              const res = await fetch('http://localhost:8000/genius/generate?user_id=aanvi');
+              if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+              var data = await res.json();
+              data = data.result
+              output.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+              output.textContent = "Failed to fetch: " + err.message;
+            }
+          });
+        });
+      </script>
 
       <h2 class="text-2xl font-semibold mb-6">Recently Played</h2>
 
