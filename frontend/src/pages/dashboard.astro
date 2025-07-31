@@ -6,7 +6,7 @@ import Layout from '../layouts/Layout.astro';
 
 
 
-const streak = await fetch("http://localhost:8000/users/aanvi/streak").then(res => res.json()).then(data => data.streak_count || 0);
+const streak = await fetch(`http://localhost:8000/users/${Astro.cookies.get('user_id')}/streak`).then(res => res.json()).then(data => data.streak_count || 0);
 
 ---
 
