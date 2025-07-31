@@ -1,86 +1,63 @@
 ---
-import { coerce } from "astro:schema";
 import Layout from "../layouts/Layout.astro";
-'use client';
 
-async function fetchData() {
-  try {
-    console.log('loading.....');
-    const response = await fetch('http://localhost:8000/genius/generate?user_id=aanvi');
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    const result = await response.json();
-    
-    console.log(result); // Or do something more useful
-  } catch (err) {
-    console.error('Error fetching data:', err);
-  }
-}
-
-var playlists = [
-  {
-    id: 1,
-    name: "Morning Vibes",
-    description: "Perfect for starting your day",
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-    songCount: 24,
-    duration: "1h 32m",
-    lastPlayed: "2 days ago"
-  },
-  {
-    id: 2,
-    name: "Focus Flow",
-    description: "Deep work and concentration",
-    image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=300&fit=crop",
-    songCount: 18,
-    duration: "58m",
-    lastPlayed: "1 week ago"
-  },
-  {
-    id: 3,
-    name: "Chill Evenings",
-    description: "Relaxing tunes for unwinding",
-    image: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400&h=300&fit=crop",
-    songCount: 31,
-    duration: "2h 15m",
-    lastPlayed: "3 days ago"
-  },
-  {
-    id: 4,
-    name: "Workout Energy",
-    description: "High-energy tracks for exercise",
-    image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
-    songCount: 27,
-    duration: "1h 48m",
-    lastPlayed: "5 days ago"
-  },
-  {
-    id: 5,
-    name: "Study Sessions",
-    description: "Instrumental and ambient sounds",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
-    songCount: 22,
-    duration: "1h 23m",
-    lastPlayed: "1 week ago"
-  },
-  {
-    id: 6,
-    name: "Road Trip Mix",
-    description: "Adventures and good times",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
-    songCount: 35,
-    duration: "2h 42m",
-    lastPlayed: "2 weeks ago"
-  }
+// Pre-existing array with song data structure
+const songs = [
+  [
+    {
+      "title": "back to friends",
+      "artist": "sombr",
+      "popularity": 99,
+      "link": "https://open.spotify.com/track/0FTmksd2dxiE5e3rWyJXs6"
+    },
+    99
+  ],
+  [
+    {
+      "title": "undressed",
+      "artist": "sombr",
+      "popularity": 95,
+      "link": "https://open.spotify.com/track/4AajxCEwGEsmHmT4H1TwjY"
+    },
+    95
+  ],
+  [
+    {
+      "title": "No One Noticed",
+      "artist": "The Marías",
+      "popularity": 92,
+      "link": "https://open.spotify.com/track/2QqQzWjGLJ1QOcJ2sm1nYY"
+    },
+    92
+  ],
+  [
+    {
+      "title": "Cariño",
+      "artist": "The Marías",
+      "popularity": 88,
+      "link": "https://open.spotify.com/track/4iW5JJy6xAd5uY5dGxmcfl"
+    },
+    88
+  ],
+  [
+    {
+      "title": "Hold It Together",
+      "artist": "The Marías",
+      "popularity": 85,
+      "link": "https://open.spotify.com/track/6gSI0bwJSP5aEPJ7lCrqrT"
+    },
+    85
+  ],
+  [
+    {
+      "title": "I Don't Know You",
+      "artist": "The Marías",
+      "popularity": 82,
+      "link": "https://open.spotify.com/track/4c7OLf2cmi7FkFpwvnAzhG"
+    },
+    82
+  ]
 ];
-// const response = await fetch(`http://localhost:8000/genius/generate?userid=${encodeURIComponent("aanvi")}`);
-// let playlists = [];
-
-// try {
-//   const data = await response.json();
-//   playlists = data.playlists || []; // or adjust based on what your backend returns
-// } catch (error) {
-//   console.error("Fetch failed:", error);
-// }
 
 ---
 
@@ -88,76 +65,63 @@ var playlists = [
   <div class="bg-white text-black font-sans min-h-screen px-6 py-12">
     <div class="max-w-7xl mx-auto">
       <div class="mb-10">
-        <h1 class="text-4xl font-extrabold mb-2 tracking-tight">My Playlists</h1>
-        <p class="text-lg text-gray-600">Your personal collection of curated music</p>
+        <h1 class="text-4xl font-extrabold mb-2 tracking-tight">Your Music Recommendations</h1>
+        <p class="text-lg text-gray-600">Songs curated based on your journal entries</p>
       </div>
 
-      <button id="generate-btn" >
-        Generate from Genius
-      </button>
-      <pre id="output" class="bg-gray-100 p-4 rounded-lg mt-4"></pre>
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const button = document.getElementById('generate-btn');
-            const output = document.getElementById('output');
-  
-            button.addEventListener('click', async () => {
-            output.textContent = "Loading...";
-  
-            try {
-              const res = await fetch('http://localhost:8000/genius/generate?user_id=aanvi');
-              if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-              var data = await res.json();
-              data = data.result
-              output.textContent = JSON.stringify(data, null, 2);
-            } catch (err) {
-              output.textContent = "Failed to fetch: " + err.message;
-            }
-          });
-        });
-      </script>
-
-      <h2 class="text-2xl font-semibold mb-6">Recently Played</h2>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {playlists.map((playlist) => (
-          <div 
-            class="relative bg-black text-white rounded-[1.5rem] overflow-hidden shadow-xl transition-all duration-300 group hover:-translate-y-1 hover:shadow-2xl"
-            data-playlist-id={playlist.id}
-          >
-            <!-- Image with corner cut -->
-            <div class="relative">
-              <img 
-                src={playlist.image} 
-                alt={playlist.name}
-                class="w-full h-48 object-cover brightness-75 group-hover:brightness-100 transition duration-300 rounded-t-[1.5rem]"
-              />
-              <!-- Play button -->
-              <button 
-                aria-label={"Play " + playlist.name}
-                class="absolute top-4 right-4 w-11 h-11 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-200 group-hover:shadow-md"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M6 4l10 6-10 6V4z" />
-                </svg>
-              </button>
-            </div>
-
-            <!-- Content section -->
-            <div class="p-6 bg-white text-black rounded-b-[1.5rem]">
-              <h3 class="text-xl font-bold mb-1">{playlist.name}</h3>
-              <p class="text-sm text-gray-500 mb-4">{playlist.description}</p>
-              <div class="flex justify-between items-center text-sm text-gray-600">
-                <div class="flex gap-3">
-                  <span>♪ {playlist.songCount}</span>
-                  <span>⏱ {playlist.duration}</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {songs.map((songData: any, index: number) => {
+          const song = songData[0]; // Extract the song object from [songObject, score]
+          const score = songData[1]; // Extract the score
+          return (
+            <div 
+              class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm transition-shadow duration-300"
+              data-song-index={index}
+            >
+              <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                  <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{song.title}</h3>
+                    <p class="text-sm text-gray-600">{song.artist}</p>
+                  </div>
+                  <div class="flex flex-col items-end">
+                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                      {song.popularity}% Appeal
+                    </span>
+                  </div>
                 </div>
-                <span class="text-xs text-gray-400">{playlist.lastPlayed}</span>
+                
+                <div class="flex justify-between items-center group">
+                  <a 
+                    href={song.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center px-4 py-2 text-black hover:text-white text-sm rounded-lg hover:bg-black transition-colors"
+                  >
+                    <div class="w-4 h-4 mr-2 bg-contain bg-no-repeat bg-center" style="background-image: url('/Logo.png');" data-white-logo="/Logo-white.png"></div>
+                    Open in Spotify
+                  </a>
+                  
+                  <button 
+                    class="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label="Share song"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   </div>
+
+  <style>
+    .group:hover .bg-contain {
+      background-image: url('/Logo-white.png') !important;
+    }
+  </style>
 </Layout>
