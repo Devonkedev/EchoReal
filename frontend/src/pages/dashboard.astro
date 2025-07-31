@@ -1,0 +1,159 @@
+---
+import type { typecast } from 'astro:schema';
+import Layout from '../layouts/Layout.astro';
+
+
+
+
+
+const streak = await fetch("http://localhost:8000/users/aanvi/streak").then(res => res.json()).then(data => data.streak_count || 0);
+
+---
+
+<Layout title="Dashboard - Echo Journal">
+  <div class="p-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-semibold mb-2">Welcome back! </h1>
+      <p class="text-gray-600">How are you feeling today?</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <p class="text-sm text-gray-600 mb-2">Today's Entries</p>
+        <p class="text-3xl font-semibold text-black mb-1">0</p>
+        <p class="text-xs text-gray-400">journal entries today</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <p class="text-sm text-gray-600 mb-2">Current Streak</p>
+        <p class="text-3xl font-semibold text-black mb-1">{streak}</p>
+        <p class="text-xs text-gray-400">days in a row</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <p class="text-sm text-gray-600 mb-2">Total Entries</p>
+        <p class="text-3xl font-semibold text-black mb-1">0</p>
+        <p class="text-xs text-gray-400">all time</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-6 border mb-8">
+      <h2 class="text-xl font-semibold mb-4">Journal Entry</h2>
+      <p class="text-gray-600 mb-6">How are you feeling today?</p>
+
+      <div class="mb-8">
+        <h3 class="text-lg font-medium mb-4">Select Your Mood</h3>
+        <div id="moodButtons" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="happy">
+            <span class="text-sm font-medium">Happy</span>
+          </button>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="calm">
+            <span class="text-sm font-medium">Calm</span>
+          </button>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="sad">
+            <span class="text-sm font-medium">Sad</span>
+          </button>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="frustrated">
+            <span class="text-sm font-medium">Frustrated</span>
+          </button>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="tired">
+            <span class="text-sm font-medium">Tired</span>
+          </button>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="excited">
+            <span class="text-sm font-medium">Excited</span>
+          </button>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="anxious">
+            <span class="text-sm font-medium">Anxious</span>
+          </button>
+          <button class="mood-btn flex flex-col items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors" data-mood="confident">
+            <span class="text-sm font-medium">Confident</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-medium mb-4">Write Your Thoughts</h3>
+        <textarea id="journalText" class="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="What's on your mind today? Share your thoughts, feelings, or experiences..."></textarea>
+        <div class="flex justify-end mt-4">
+          <button id="generateBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Save Entry</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-6 border">
+      <h2 class="text-lg font-medium mb-4">Recent Entries</h2>
+      <p class="text-gray-500">No entries yet. Start journaling to see your progress!</p>
+    </div>
+  </div>
+
+  <div id="songModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+    <div class="bg-white rounded-2xl shadow-lg w-[90%] max-w-md p-6">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Song Matches</h2>
+      <ul id="songList" class="space-y-3 text-sm text-gray-700"></ul>
+      <div class="mt-6 text-right">
+        <button id="closeModalBtn" class="text-blue-600 font-medium hover:underline">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script type="module">
+    // console.log(document.cookie);
+    document.addEventListener("DOMContentLoaded", () => {
+      const generateBtn = document.getElementById("generateBtn");
+      const journalInput = document.getElementById("journalText");
+      const songModal = document.getElementById("songModal");
+      const songList = document.getElementById("songList");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      let selectedMood = null;
+
+      document.querySelectorAll(".mood-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedMood = btn.dataset.mood;
+          document.querySelectorAll(".mood-btn").forEach(b => b.classList.remove("ring", "ring-2", "ring-blue-500"));
+          btn.classList.add("ring", "ring-2", "ring-blue-500");
+        });
+      });
+
+      closeModalBtn.addEventListener("click", () => {
+        songModal.classList.add("hidden");
+      });
+
+      generateBtn.addEventListener("click", async () => {
+        const text = journalInput.value.trim();
+        if (!selectedMood || !text) {
+          alert("Please write something and pick a mood first.");
+          return;
+        }
+
+        const moodIntensity = selectedMood === "happy" ? 3 : selectedMood === "sad" ? 2 : 1;
+
+        const payload = {
+          user_id: "aanvi",
+          mood: selectedMood,
+          text: text,
+          mood_intensity: moodIntensity,
+          spotify_track_id: ""
+        };
+
+        try {
+          const response = await fetch("http://localhost:8000/journal/entries", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+
+          });
+
+          alert("Journal entry saved successfully!");
+          window.location.reload();
+        }
+        
+        catch (error) {
+          console.error("Error saving journal entry:", error);
+          alert("Failed to save your entry. Please try again.");
+          return;
+        }
+      })});
+  </script>
+</Layout>

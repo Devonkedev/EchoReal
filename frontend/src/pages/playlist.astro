@@ -1,7 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
-<<<<<<< HEAD
 const playlist = await fetch("http://localhost:8000/genius/create" + new URLSearchParams({
   "user_id": "aanvi"
 }), {
@@ -11,6 +10,7 @@ const playlist = await fetch("http://localhost:8000/genius/create" + new URLSear
   }
 }).then(res => res.json());
 
+console.log(playlist);
 const playlists = [
   {
     id: 1,
@@ -67,18 +67,16 @@ const playlists = [
     lastPlayed: "2 weeks ago"
   }
 ];
-=======
-const response = await fetch(`http://localhost:8000/genius/generate?userid=${encodeURIComponent("aanvi")}`);
-let playlists = [];
+// const response = await fetch(`http://localhost:8000/genius/generate?userid=${encodeURIComponent("aanvi")}`);
+// let playlists = [];
 
-try {
-  const data = await response.json();
-  playlists = data.playlists || []; // or adjust based on what your backend returns
-} catch (error) {
-  console.error("Fetch failed:", error);
-}
+// try {
+//   const data = await response.json();
+//   playlists = data.playlists || []; // or adjust based on what your backend returns
+// } catch (error) {
+//   console.error("Fetch failed:", error);
+// }
 
->>>>>>> cb215b19a3344b7e662cdc0033def3f35fc57433
 ---
 
 <Layout>

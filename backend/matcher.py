@@ -172,10 +172,12 @@ def match(txt, ana_fn):
         result += f"{i}. {track['title']} by {track['artist']}\n"
         result += f"   {track['link']}\n"
 
+    print("Results", result)
     return result.strip()
 
+match("right now I feel really nice and light. its raining outside, and the rain is making me happy. I am at work, sipping coffee and the enviorment is chill. My collegaues are in a jolly mood today. I am feeling very light headed today. its a good day", ana)
 
-if __name__ == "__main__":
-    journal = input("Your journal entry: ")
-    result = match(journal, ana)
-    print(result)
+# if __name__ == "__main__":
+#     journal = input("Your journal entry: ")
+#     result = match(journal, ana)
+#     print(result)

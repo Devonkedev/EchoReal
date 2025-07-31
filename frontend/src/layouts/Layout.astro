@@ -1,10 +1,20 @@
 ---
-import { AstroCookies } from "astro";
+'client:load'
+import { Astro } from "astro";
 
 const { title = "Echo Journal" } = Astro.props;
 
 // Get current path to highlight active nav item
 const currentPath = Astro.url.pathname;
+var user_id = "";
+var email = "No email found";
+
+user_id = Astro.cookies.get('user_id')?.value;
+email = await fetch(`http://localhost:8000/auth/user/${user_id}`)
+  .then(res => res.json())
+  .then(data => data.email || "No email found");
+
+
 
 ---
 
@@ -19,13 +29,13 @@ const currentPath = Astro.url.pathname;
   <body class="flex min-h-screen bg-gray-50">
     <aside class="w-64 bg-white border-r flex flex-col justify-between">
       <div>
-        <div class="flex items-center px-6 py-4 text-2xl font-semibold border-b">
-          <i class="fas fa-microphone mr-2"></i> Echo
+        <div class="flex items-center px-6 py-4 text-2xl h-20  font-semibold border-b">
+            <img src="Untitled_Artwork.gif" alt="Echo Journal Logo" class="mx-auto mt-4 overflow-hidden" />
         </div>
         <nav class="mt-4">
           <ul>
-            <li class={`px-6 py-3 ${currentPath === '/' || currentPath === '/index.html' ? 'bg-gray-100 text-gray-900 font-medium' : 'hover:bg-gray-100'} cursor-pointer`}>
-              <a href="/" class="flex items-center w-full">
+            <li class={`px-6 py-3 ${currentPath === '/dashboard' || currentPath === '/dashboard' ? 'bg-gray-100 text-gray-900 font-medium' : 'hover:bg-gray-100'} cursor-pointer`}>
+              <a href="dashboard.html" class="flex items-center w-full">
                 <i class="fas fa-chart-line mr-2"></i> Dashboard
               </a>
             </li>
@@ -44,14 +54,19 @@ const currentPath = Astro.url.pathname;
                 <i class="fas fa-cog mr-2"></i> Profile
               </a>
             </li>
+            <li class={`px-6 py-3 ${currentPath === '/logout.html' || currentPath === '/logout' ? 'bg-gray-100 text-gray-900 font-medium' : 'hover:bg-gray-100'} cursor-pointer`}>
+              <a href="/logout" class="flex items-center w-full">
+                <i class="fas fa-cog mr-2"></i> Logout
+              </a>
+            </li>
           </ul>
         </nav>
       </div>
       <div class="px-6 py-4 border-t flex items-center space-x-2">
         <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-semibold text-white">S</div>
         <div>
-          <p class="text-sm font-medium">shayan</p>
-          <p class="text-xs text-gray-500">shayan@labubu.com</p>
+          <p class="text-sm font-medium" id="name">{user_id}</p>
+          <p class="text-xs text-gray-500" id="email">{email}</p>
         </div>
       </div>
     </aside>
@@ -63,7 +78,7 @@ const currentPath = Astro.url.pathname;
     </main>
 
     <script>
-
+//For testing purposes, set a user ID
       document.addEventListener('DOMContentLoaded', () => {
         const navLinks = document.querySelectorAll('nav a');
         
@@ -80,6 +95,8 @@ const currentPath = Astro.url.pathname;
           });
         });
       });
+
+
     </script>
   </body>
 </html>

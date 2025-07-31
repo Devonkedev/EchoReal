@@ -1,6 +1,6 @@
 import requests, base64, re #type: ignore
 from bs4 import BeautifulSoup #type: ignore
-from backend.lib.semantics import ana
+from lib.semantics import ana
 from dotenv import load_dotenv #type: ignore
 import os
 load_dotenv()

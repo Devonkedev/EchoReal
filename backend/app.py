@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-
+from fastapi import Response
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
@@ -16,6 +16,12 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
 import asyncio
 import uvicorn
+
+
+class LoginRequest(BaseModel):
+    user_id: str | None = None
+    email: str | None = None
+    password: str
 
 DATABASE_PATH = os.environ.get("ECHO_DB", os.path.join(os.path.dirname(__file__), "echo.db"))
 
@@ -255,6 +261,22 @@ async def attach_song(entry_id: int, req: AttachSongRequest):
         conn.commit()
     return {"status": "attached"}
 
+@app.get("/journal/entries/user-latest/{user_id}")
+async def get_song(user_id: str):
+    now = datetime.utcnow()
+    ts_str = now.isoformat()
+
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id is required")
+    with get_connection() as conn:
+        print(ts_str)
+        cur = conn.execute("SELECT * FROM journal_entries WHERE user_id = ? ORDER BY timestamp DESC", (user_id,))
+        row = cur.fetchone()
+    
+    if row is None:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    return to_entry_dict(row)
+
 @app.get("/recommendations")
 async def recommendations():
     songs = [
@@ -357,15 +379,15 @@ async def genius_generate(user_id: str = Query(...)):
         raise HTTPException(status_code=400, detail="user_id is required")
     global text
     with get_connection() as conn:
-        cur = conn.execute("SELECT * FROM journal_entries WHERE user_id = ?", (user_id,))
+        cur = conn.execute("SELECT * FROM journal_entries WHERE user_id = ? ORDER BY timestamp DESC", (user_id,))
         row = cur.fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="Entry not found")
     text = row["text"]
     if not text:
         raise HTTPException(status_code=400, detail="No text found in entry")
-    from backend.lib.matcher import match
-    from backend.lib.semantics import ana
+    from lib.matcher import match
+    from lib.semantics import ana
     result = match(text, ana)
     return {"result": result}
 
@@ -484,12 +506,17 @@ async def register_user(request: Request):
 
 
 
-@app.get("/auth/login")
-async def login_user(request: Request):
-    data = await request.json()
-    user_id = data.get("user_id")
-    password = data.get("password")
-    email = data.get("email")
+@app.post("/auth/login")
+async def login_user(payload: LoginRequest, response: Response):
+    user_id = payload.user_id
+    email = payload.email
+    password = payload.password
+
+    if not password:
+        raise HTTPException(status_code=400, detail="password is required")
+    if not user_id or not email:
+        raise HTTPException(status_code=400, detail="email or user_id is required")
+    
     if email:
         with get_connection() as conn:
             cur = conn.execute(
@@ -533,5 +560,33 @@ async def login_user(request: Request):
         "currentDate": current_date,
         "expiryDate": expiry_date
     }
+
+    response.set_cookie(key="user_id", value=session_info["user_id"], path="/")
+    response.set_cookie(key="currentDate", value=session_info["currentDate"], path="/")
+    response.set_cookie(key="expiryDate", value=session_info["expiryDate"], path="/")
     
     return {"status": "logged in", "user_id": user["user_id"], "session": session_info} 
+
+@app.get('/auth/user/{user_id}')
+async def get_user(user_id: str):
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id is required")
+    with get_connection() as conn:
+        cur = conn.execute("SELECT * FROM auth_data WHERE user_id = ?", (user_id,))
+        user = cur.fetchone()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {
+        "user_id": user["user_id"],
+        "email": user["email"]
+    }
+@app.delete('/auth/user/{user_id}')
+async def delete_user(user_id: str):
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id is required")
+    with get_connection() as conn:
+        cur = conn.execute("DELETE FROM auth_data WHERE user_id = ?", (user_id,))
+        if cur.rowcount == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        conn.commit()
+    return {"status": "deleted"}

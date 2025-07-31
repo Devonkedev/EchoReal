@@ -1,16 +1,91 @@
 ---
+'client:load';
+import { formDataToObject } from "astro:actions";
+
+import { redirect } from "astro:router";
 
 
 
 ---
 
-<form>
-    <h1>Login Page</h1>
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
-    
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    
-    <button type="submit">Login</button>
-</form>
+<html lang="en">
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <h1>Login</h1>
+    <form id="login-form">
+      <label for="email">Email:</label><br />
+      <input type="email" id="email" name="email" /><br />
+
+      <label for="user_id">User ID:</label><br />
+      <input type="text" id="user_id" name="user_id" /><br />
+
+      <label for="password">Password:</label><br />
+      <input type="password" id="password" name="password" /><br />
+
+      <button type="submit">Login</button>
+    </form>
+
+    <script>
+      if (localStorage.getItem("user_id")) {
+        // If user is already logged in, redirect to dashboard
+        window.location.href = "/dashboard";
+      }
+      document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const user_id = document.getElementById("user_id").value;
+        const password = document.getElementById("password").value;
+
+        const payload = { password };
+        if (email) payload.email = email;
+        if (user_id) payload.user_id = user_id;
+
+
+        if (!payload.email && !payload.user_id) {
+          alert("Please provide either an email or user ID.");
+          return;
+        }
+
+        payload.password = password;
+
+        // console.log("Login payload:", payload);
+        try {
+          const res = await fetch("http://localhost:8000/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) {
+            const err = await res.json();
+            alert("Login failed: " + err.detail);
+            return;
+          }
+
+          const data = await res.json();
+
+          // Save session info to cookies
+          const { session } = data;
+          document.cookie = `user_id=${session.user_id}; path=/`;
+          document.cookie = `currentDate=${session.currentDate}; path=/`;
+          document.cookie = `expiryDate=${session.expiryDate}; path=/`;
+
+          localStorage.setItem("user_id", session.user_id);
+
+          alert("Logged in successfully!");
+          // Redirect if needed
+          window.location.href = "/dashboard";
+          localStorage.setItem("user_id", session.user_id); // 
+        } catch (err) {
+          console.error("Login error:", err);
+          alert("An error occurred during login.");
+        }
+      });
+    </script>
+  </body>
+</html>

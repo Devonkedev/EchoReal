@@ -1,4 +1,5 @@
 ---
+'use:client'
 import Layout from "../layouts/Layout.astro"
 
 const title = "Profile & Settings - Echo Journal"
@@ -8,6 +9,8 @@ const user = {
   email: "sarah@echo.com",
   avatar: "S"
 }
+
+console.log(Astro.cookies.get('user_id')?.value);
 
 const settingsCategories = [
   {
@@ -72,6 +75,10 @@ function handleHelpAction(action) {
     toast = null
   }, 3000)
 }
+
+const userId = Astro.cookies.get('user_id')?.value;
+
+
 ---
 <Layout title={title}>
   <div class="max-w-5xl mx-auto py-10 px-4">
