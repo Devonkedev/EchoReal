@@ -1,9 +1,9 @@
 import re
-import nltk
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from sklearn.feature_extraction.text import TfidfVectorizer
+import nltk  #type: ignore
+from nltk.corpus import stopwords #type: ignore
+from nltk.stem import WordNetLemmatizer #type: ignore
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer #type: ignore
+from sklearn.feature_extraction.text import TfidfVectorizer #type: ignore
 from transformers import pipeline
 nltk.download('punkt')
 nltk.download('stopwords')

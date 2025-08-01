@@ -1,6 +1,63 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
+// Pre-existing array with song data structure
+const songs = [
+  [
+    {
+      "title": "back to friends",
+      "artist": "sombr",
+      "popularity": 99,
+      "link": "https://open.spotify.com/track/0FTmksd2dxiE5e3rWyJXs6"
+    },
+    99
+  ],
+  [
+    {
+      "title": "undressed",
+      "artist": "sombr",
+      "popularity": 95,
+      "link": "https://open.spotify.com/track/4AajxCEwGEsmHmT4H1TwjY"
+    },
+    95
+  ],
+  [
+    {
+      "title": "No One Noticed",
+      "artist": "The Marías",
+      "popularity": 92,
+      "link": "https://open.spotify.com/track/2QqQzWjGLJ1QOcJ2sm1nYY"
+    },
+    92
+  ],
+  [
+    {
+      "title": "Cariño",
+      "artist": "The Marías",
+      "popularity": 88,
+      "link": "https://open.spotify.com/track/4iW5JJy6xAd5uY5dGxmcfl"
+    },
+    88
+  ],
+  [
+    {
+      "title": "Hold It Together",
+      "artist": "The Marías",
+      "popularity": 85,
+      "link": "https://open.spotify.com/track/6gSI0bwJSP5aEPJ7lCrqrT"
+    },
+    85
+  ],
+  [
+    {
+      "title": "I Don't Know You",
+      "artist": "The Marías",
+      "popularity": 82,
+      "link": "https://open.spotify.com/track/4c7OLf2cmi7FkFpwvnAzhG"
+    },
+    82
+  ]
+];
 // const song = await fetch("http://localhost:8000/genius/create" + new URLSearchParams({
 //   "user_id": "aanvi"
 // }), {
@@ -172,11 +229,17 @@ const songs = [
                 <span class="text-xs text-gray-400">{song.lastPlayed}</span>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   </div>
+
+  <style>
+    .group:hover .bg-contain {
+      background-image: url('/Logo-white.png') !important;
+    }
+  </style>
 </Layout>
 
 <script>
