@@ -96,12 +96,15 @@ const userId = Astro.cookies.get('user_id')?.value;
               {category.items.map((item) => (
                 <li class="flex justify-between items-center">
                   <span class="text-gray-800 dark:text-gray-300">{item.label}</span>
-                  <input 
-                    type="checkbox" 
-                    checked={item.value}
-                    class="toggle"
-                    onChange={(e) => applySetting(item.key, e.currentTarget.checked)}
-                  />
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={item.value}
+                      class="sr-only peer setting-toggle"
+                      data-setting={item.key}
+                    />
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  </label>
                 </li>
               ))}
             </ul>
@@ -117,8 +120,8 @@ const userId = Astro.cookies.get('user_id')?.value;
         <div class="grid gap-4">
           {helpItems.map((item) => (
             <button
-              class={`flex items-start gap-4 p-4 rounded-lg transition hover:shadow-md ${item.color}`}
-              onClick={() => handleHelpAction(item.title)}
+              class={`help-button flex items-start gap-4 p-4 rounded-lg transition hover:shadow-md ${item.color}`}
+              data-action={item.title}
             >
               <div class="text-2xl mt-1">
                 <i class={item.icon}></i>
@@ -140,3 +143,99 @@ const userId = Astro.cookies.get('user_id')?.value;
     )}
   </div>
 </Layout>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // Simple toast function
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-6 right-6 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300';
+    toast.textContent = message;
+    toast.style.opacity = '0';
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.style.opacity = '1', 10);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // Handle all toggle switches
+  const toggles = document.querySelectorAll('.setting-toggle');
+  toggles.forEach(function(toggle) {
+    const settingKey = toggle.getAttribute('data-setting');
+    
+    // Set initial state for dark mode toggle
+    if (settingKey === 'darkMode') {
+      const isDark = document.documentElement.classList.contains('dark');
+      toggle.checked = isDark;
+    }
+    
+    // Add change listener
+    toggle.addEventListener('change', function() {
+      const isEnabled = this.checked;
+      
+      if (settingKey === 'darkMode') {
+        // Handle dark mode
+        if (isEnabled) {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+          showToast('Dark mode enabled');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+          showToast('Dark mode disabled');
+        }
+      } else {
+        // Handle other settings
+        localStorage.setItem(settingKey, isEnabled.toString());
+        showToast(settingKey + ' ' + (isEnabled ? 'enabled' : 'disabled'));
+      }
+    });
+  });
+
+  // Handle help buttons
+  const helpButtons = document.querySelectorAll('.help-button');
+  helpButtons.forEach(function(button) {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const action = this.getAttribute('data-action');
+      
+      showToast('Clicked: ' + action);
+      
+      // Handle specific actions
+      setTimeout(function() {
+        switch(action) {
+          case 'Contact Support':
+            window.location.href = '/support.html';
+            break;
+          case 'FAQs':
+            window.open('https://help.example.com/faq', '_blank');
+            break;
+          case 'Privacy Policy':
+            window.location.href = '/privacy.html';
+            break;
+          case 'Give Feedback':
+            window.location.href = '/feedback.html';
+            break;
+        }
+      }, 500);
+    });
+  });
+
+});
+</script>
+
+<style>
+/* Simple styles for smooth transitions */
+.setting-toggle {
+  transition: all 0.3s ease;
+}
+
+.help-button:hover {
+  transform: translateY(-2px);
+}
+</style>

@@ -19,8 +19,8 @@ import uvicorn
 
 
 class LoginRequest(BaseModel):
-    user_id: str | None = None
-    email: str | None = None
+    user_id: str
+    email: str
     password: str
 
 DATABASE_PATH = os.environ.get("ECHO_DB", os.path.join(os.path.dirname(__file__), "echo.db"))

@@ -15,7 +15,7 @@ import Layout from '../layouts/Layout.astro';
         <form class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Feedback Type</label>
-            <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <select class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
               <option>General Feedback</option>
               <option>Bug Report</option>
               <option>Feature Request</option>
@@ -25,15 +25,15 @@ import Layout from '../layouts/Layout.astro';
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Name (Optional)</label>
-            <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <input type="text" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email (Optional)</label>
-            <input type="email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <input type="email" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Feedback</label>
-            <textarea rows="6" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Tell us what you think..."></textarea>
+            <textarea rows="6" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="Tell us what you think..."></textarea>
           </div>
           <div>
             <label class="flex items-center">
@@ -92,13 +92,13 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', function() {
       const stars = document.querySelectorAll('.rating-star');
-      stars.forEach(star => {
-        star.addEventListener('click', (e) => {
-          const rating = e.target.getAttribute('data-rating');
-          stars.forEach((s, index) => {
+      stars.forEach(function(star) {
+        star.addEventListener('click', function(e) {
+          const rating = parseInt(e.target.getAttribute('data-rating'));
+          stars.forEach(function(s, index) {
             if (index < rating) {
               s.style.color = '#FCD34D';
             } else {

@@ -1,58 +1,384 @@
 ---
 import Layout from '../layouts/Layout.astro'
+
+// Hardcoded data for friend requests
+const friendRequests = [
+
+];
+const friends = [
+  {
+    id: 1,
+    name: "Vrinda.",
+    username: "vrindaislabubu",
+    feeling: "Sad",
+    lastSeen: "30 Seconds ago",
+    initials: "VR",
+    status: "online"
+  },
+];
 ---
 
 <Layout>
-  <div class="px-6 py-6">
-    <h1 class="text-2xl font-semibold mb-2">👥 Friends</h1>
-    <p class="text-gray-500 mb-6">Manage your social circle, check how your friends are feeling, and connect.</p>
+  <div class="flex h-screen bg-gray-50 dark:bg-zinc-900">
+    <!-- Main Content -->
+    <div class="flex-1 px-8 py-6 overflow-y-auto">
+      <div class="max-w-4xl">
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white">Friends</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-8">Manage your social circle and connect with others</p>
 
-
-    <div class="mb-10">
-      <h2 class="text-lg font-medium mb-3">Friend Requests</h2>
-      <div class="space-y-3">
-
-        <div class="flex justify-between items-center p-4 bg-white dark:bg-zinc-900 rounded-xl shadow border border-gray-200 dark:border-zinc-700">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gray-300 dark:bg-zinc-700 rounded-full"></div>
-            <span class="font-medium">Aryan S.</span>
+        <!-- Friend Requests Section -->
+        <div class="mb-12">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Friend Requests</h2>
+            <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-medium">
+              {friendRequests.length}
+            </span>
           </div>
-          <div class="flex gap-2">
-            <button class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">Accept</button>
-            <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">Decline</button>
+          
+          <div class="space-y-4" id="friend-requests">
+            {friendRequests.map((request) => (
+              <div class="flex items-center justify-between p-6 bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-gray-200 dark:border-zinc-700 friend-request hover:shadow-md transition-all duration-200" data-request-id={request.id}>
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                    {request.initials}
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-gray-800 dark:text-white">{request.name}</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">@{request.username}</p>
+                  </div>
+                </div>
+                <div class="flex gap-3">
+                  <button class="accept-btn px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors duration-200">
+                    Accept
+                  </button>
+                  <button class="decline-btn px-6 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors duration-200">
+                    Decline
+                  </button>
+                </div>
+              </div>
+            ))}
+            
+            {friendRequests.length === 0 && (
+              <div class="text-center py-12 text-gray-500 dark:text-gray-400">
+                <p class="text-lg">No pending friend requests</p>
+                <p class="text-sm mt-2">When someone sends you a request, it will appear here</p>
+              </div>
+            )}
           </div>
         </div>
 
-      </div>
-    </div>
-
-    <div class="mb-10">
-      <h2 class="text-lg font-medium mb-3">Add a Friend</h2>
-      <div class="flex gap-3">
-        <input
-          type="text"
-          placeholder="Search by username or email"
-          class="w-full px-4 py-2 border border-gray-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-sm focus:outline-none"
-        />
-        <button class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm">Send Request</button>
-      </div>
-    </div>
-    <div>
-      <h2 class="text-lg font-medium mb-3">Your Friends</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-
-        <div class="p-4 bg-white dark:bg-zinc-900 rounded-xl shadow border border-gray-200 dark:border-zinc-700 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gray-300 dark:bg-zinc-700 rounded-full"></div>
-            <div>
-              <p class="font-medium">Maya R.</p>
-              <p class="text-sm text-gray-500 dark:text-zinc-400">Feeling: 😊 Happy</p>
+        <!-- Add Friend Section -->
+        <div class="mb-12">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Add a Friend</h2>
+          <div class="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-zinc-700">
+            <div class="flex gap-4">
+              <input
+                type="text"
+                id="friend-search"
+                placeholder="Search by username or email..."
+                class="flex-1 px-4 py-3 border border-gray-300 dark:border-zinc-600 rounded-xl bg-gray-50 dark:bg-zinc-700 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              />
+              <button id="send-request-btn" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors duration-200">
+                Search
+              </button>
             </div>
+            <div id="search-results" class="mt-4 space-y-3 hidden"></div>
           </div>
-          <button class="text-red-500 hover:text-red-600 text-sm">Remove</button>
         </div>
-    
+
+        <!-- All Friends Grid -->
+        <div>
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">All Friends</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="friends-list">
+            {friends.map((friend) => (
+              <div class="p-6 bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-gray-200 dark:border-zinc-700 friend-card hover:shadow-md transition-all duration-200" data-friend-id={friend.id}>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4">
+                    <div class="relative">
+                      <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
+                        {friend.initials}
+                      </div>
+                      <div class={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-3 border-white dark:border-zinc-800 ${
+                        friend.status === 'online' ? 'bg-green-500' :
+                        friend.status === 'away' ? 'bg-yellow-500' : 'bg-gray-400'
+                      }`}></div>
+                    </div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800 dark:text-white">{friend.name}</h3>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">Feeling: {friend.feeling}</p>
+                      <p class="text-xs text-gray-400 dark:text-gray-500">Last seen: {friend.lastSeen}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button class="message-btn p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-200" title="Message">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                      </svg>
+                    </button>
+                    <button class="remove-btn p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200" title="Remove Friend">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Friends Sidebar -->
+    <div class="w-80 bg-white dark:bg-zinc-800 border-l border-gray-200 dark:border-zinc-700 p-6 overflow-y-auto">
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Online Friends</h3>
+        <div class="space-y-3">
+          {friends.filter(friend => friend.status === 'online').map((friend) => (
+            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors duration-200 cursor-pointer">
+              <div class="relative">
+                <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                  {friend.initials}
+                </div>
+                <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-zinc-800"></div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-800 dark:text-white text-sm truncate">{friend.name}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{friend.feeling}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Away</h3>
+        <div class="space-y-3">
+          {friends.filter(friend => friend.status === 'away').map((friend) => (
+            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors duration-200 cursor-pointer">
+              <div class="relative">
+                <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                  {friend.initials}
+                </div>
+                <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-yellow-500 rounded-full border-2 border-white dark:border-zinc-800"></div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-800 dark:text-white text-sm truncate">{friend.name}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{friend.lastSeen}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Offline</h3>
+        <div class="space-y-3">
+          {friends.filter(friend => friend.status === 'offline').map((friend) => (
+            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors duration-200 cursor-pointer">
+              <div class="relative">
+                <div class="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                  {friend.initials}
+                </div>
+                <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-gray-400 rounded-full border-2 border-white dark:border-zinc-800"></div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-600 dark:text-gray-400 text-sm truncate">{friend.name}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-500 truncate">{friend.lastSeen}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   </div>
 </Layout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sample users for search functionality
+    const sampleUsers = [
+      { id: 101, name: "John Doe", username: "john_doe", initials: "JD" },
+      { id: 102, name: "Sarah Wilson", username: "sarah_w", initials: "SW" },
+      { id: 103, name: "Mike Johnson", username: "mike_j", initials: "MJ" },
+      { id: 104, name: "Lisa Chen", username: "lisa_chen", initials: "LC" }
+    ];
+
+    // Handle friend request acceptance
+    document.querySelectorAll('.accept-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const element = e.currentTarget as HTMLElement;
+        const requestCard = element.closest('.friend-request') as HTMLElement;
+        
+        // Add success animation
+        requestCard.style.transform = 'scale(0.95)';
+        requestCard.style.opacity = '0.7';
+        
+        setTimeout(() => {
+          requestCard.remove();
+          showNotification('Friend request accepted!', 'success');
+          updateRequestCount();
+        }, 300);
+      });
+    });
+
+    // Handle friend request decline
+    document.querySelectorAll('.decline-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const element = e.currentTarget as HTMLElement;
+        const requestCard = element.closest('.friend-request') as HTMLElement;
+        
+        // Add decline animation
+        requestCard.style.transform = 'translateX(-100%)';
+        requestCard.style.opacity = '0';
+        
+        setTimeout(() => {
+          requestCard.remove();
+          showNotification('Friend request declined', 'info');
+          updateRequestCount();
+        }, 300);
+      });
+    });
+
+    // Handle friend search
+    const searchInput = document.getElementById('friend-search') as HTMLInputElement;
+    const searchResults = document.getElementById('search-results') as HTMLElement;
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const query = this.value.trim().toLowerCase();
+        
+        if (query.length > 2) {
+          const filteredUsers = sampleUsers.filter(user => 
+            user.name.toLowerCase().includes(query) || 
+            user.username.toLowerCase().includes(query)
+          );
+          
+          displaySearchResults(filteredUsers);
+        } else {
+          if (searchResults) {
+            searchResults.classList.add('hidden');
+          }
+        }
+      });
+    }
+
+    function displaySearchResults(users: any[]) {
+      if (!searchResults) return;
+      
+      if (users.length === 0) {
+        searchResults.innerHTML = '<div class="text-center py-6 text-gray-500 dark:text-gray-400">No users found</div>';
+      } else {
+        searchResults.innerHTML = users.map((user: any) => `
+          <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-zinc-700 rounded-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                ${user.initials}
+              </div>
+              <div>
+                <p class="font-medium text-gray-800 dark:text-white">${user.name}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">@${user.username}</p>
+              </div>
+            </div>
+            <button class="send-individual-request px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors font-medium" data-user-id="${user.id}" data-user-name="${user.name}">
+              Add Friend
+            </button>
+          </div>
+        `).join('');
+      }
+      
+      searchResults.classList.remove('hidden');
+      
+      // Add event listeners to individual send request buttons
+      document.querySelectorAll('.send-individual-request').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          const element = e.currentTarget as HTMLElement;
+          const userName = element.dataset.userName || 'user';
+          const button = element as HTMLButtonElement;
+          button.textContent = 'Sent!';
+          button.disabled = true;
+          button.classList.add('bg-gray-500', 'cursor-not-allowed');
+          button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+          showNotification(`Friend request sent to ${userName}!`, 'success');
+        });
+      });
+    }
+
+    // Handle remove friend
+    document.querySelectorAll('.remove-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const element = e.currentTarget as HTMLElement;
+        const friendCard = element.closest('.friend-card') as HTMLElement;
+        const friendNameElement = friendCard.querySelector('h3');
+        const friendName = friendNameElement ? friendNameElement.textContent || 'Friend' : 'Friend';
+        
+        if (confirm(`Are you sure you want to remove ${friendName} from your friends?`)) {
+          friendCard.style.transform = 'scale(0.8)';
+          friendCard.style.opacity = '0';
+          
+          setTimeout(() => {
+            friendCard.remove();
+            showNotification(`${friendName} removed from friends`, 'info');
+            updateFriendsCount();
+          }, 300);
+        }
+      });
+    });
+
+    // Handle message friend
+    document.querySelectorAll('.message-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const element = e.currentTarget as HTMLElement;
+        const friendCard = element.closest('.friend-card') as HTMLElement;
+        const friendNameElement = friendCard.querySelector('h3');
+        const friendName = friendNameElement ? friendNameElement.textContent || 'Friend' : 'Friend';
+        showNotification(`Opening chat with ${friendName}...`, 'info');
+        // Here you would typically redirect to a chat page or open a chat modal
+      });
+    });
+
+    // Helper functions
+    function showNotification(message: string, type: string = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-6 right-6 px-6 py-4 rounded-xl text-white z-50 transition-all duration-300 shadow-lg ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+      }`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    function updateRequestCount() {
+      const remainingRequests = document.querySelectorAll('.friend-request').length;
+      const badge = document.querySelector('span.bg-blue-100');
+      if (badge) {
+        badge.textContent = remainingRequests.toString();
+      }
+    }
+
+    function updateFriendsCount() {
+      // This would update any friend counters in the UI
+      console.log('Friend count updated');
+    }
+
+    // Close search results when clicking outside
+    document.addEventListener('click', function(e) {
+      const target = e.target as Node;
+      if (searchInput && searchResults && target && 
+          !searchInput.contains(target) && !searchResults.contains(target)) {
+        searchResults.classList.add('hidden');
+      }
+    });
+  });
+</script>
