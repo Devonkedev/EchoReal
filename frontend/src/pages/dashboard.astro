@@ -3,12 +3,22 @@ import type { typecast } from 'astro:schema';
 import Layout from '../layouts/Layout.astro';
 const userId = Astro.cookies.get('user_id')?.value;
 
-'client:load';
-
-console.log("User ID:", userId);
+if (!userId) {
+  Astro.redirect('/login');
+}
 
 const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
-const streak = await fetch(`${backendUrl}/users/${userId}/streak`).then(res => res.json()).then(data => data.streak_count);
+let streak = 0;
+try {
+  const response = await fetch(`${backendUrl}/users/${userId}/streak`);
+  if (response.ok) {
+    const data = await response.json();
+    streak = data.streak_count || 0;
+  }
+} catch (error) {
+  console.error('Failed to fetch streak:', error);
+  streak = 0;
+}
 
 ---
 
