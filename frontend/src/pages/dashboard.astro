@@ -99,7 +99,6 @@ const streak = await fetch(`${backendUrl}/users/${userId}/streak`).then(res => r
 
 
   <script type="module">
-    // console.log(document.cookie);
     document.addEventListener("DOMContentLoaded", () => {
       const generateBtn = document.getElementById("generateBtn");
       const journalInput = document.getElementById("journalText");
@@ -130,7 +129,7 @@ const streak = await fetch(`${backendUrl}/users/${userId}/streak`).then(res => r
         const moodIntensity = selectedMood === "happy" ? 3 : selectedMood === "sad" ? 2 : 1;
        
         const payload = {
-          user_id: localStorage.getItem("user_id") || "default_user", // Replace with actual user ID logic
+          user_id: localStorage.getItem("user_id") || "default_user",
           mood: selectedMood,
           text: text,
           mood_intensity: moodIntensity,

@@ -50,27 +50,27 @@ try {
         </div>
         <nav class="mt-4">
           <ul>
-            <li class={`px-6 py-3 ${currentPath === '/dashboard' || currentPath === '/dashboard' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
-              <a href="dashboard.html" class="flex items-center w-full">
+            <li class={`px-6 py-3 ${currentPath === '/dashboard' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
+              <a href="/dashboard" class="flex items-center w-full">
                 <i class="fas fa-chart-line mr-2"></i> Dashboard
               </a>
             </li>
-            <li class={`px-6 py-3 ${currentPath === '/playlist.html' || currentPath === '/playlist' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
-              <a href="/playlist.html" class="flex items-center w-full">
+            <li class={`px-6 py-3 ${currentPath === '/playlist' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
+              <a href="/playlist" class="flex items-center w-full">
                 <i class="fas fa-music mr-2"></i> Playlists
               </a>
             </li>
-            <li class={`px-6 py-3 ${currentPath === '/friends.html' || currentPath === '/friends' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
-              <a href="/friends.html" class="flex items-center w-full">
+            <li class={`px-6 py-3 ${currentPath === '/friends' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
+              <a href="/friends" class="flex items-center w-full">
                 <i class="fas fa-user-friends mr-2"></i> Friends
               </a>
             </li>
-            <li class={`px-6 py-3 ${currentPath === '/profile.html' || currentPath === '/profile' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
-              <a href="/profile.html" class="flex items-center w-full">
+            <li class={`px-6 py-3 ${currentPath === '/profile' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
+              <a href="/profile" class="flex items-center w-full">
                 <i class="fas fa-cog mr-2"></i> Profile
               </a>
             </li>
-            <li class={`px-6 py-3 ${currentPath === '/logout.html' || currentPath === '/logout' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
+            <li class={`px-6 py-3 ${currentPath === '/logout' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`}>
               <a href="/logout" class="flex items-center w-full">
                 <i class="fas fa-sign-out-alt mr-2"></i> Logout
               </a>
@@ -94,13 +94,11 @@ try {
     </main>
 
     <script>
-//For testing purposes, set a user ID
       document.addEventListener('DOMContentLoaded', () => {
         const navLinks = document.querySelectorAll('nav a');
         
         navLinks.forEach(link => {
           link.addEventListener('click', (e) => {
-            // Add loading state
             const icon = link.querySelector('i');
             if (icon) {
               icon.classList.add('fa-spin');
