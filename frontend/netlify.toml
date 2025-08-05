@@ -4,6 +4,3 @@
 
 [build.environment]
   PUBLIC_BACKEND_URL = "https://your-backend-service.onrender.com"
-
-# Remove the redirects section since we're using server-side rendering
-# The adapter will handle routing automatically

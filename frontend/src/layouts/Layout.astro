@@ -11,7 +11,8 @@ const user_id_icon = user_id ? user_id.charAt(0).toUpperCase() : "U";
 
 try {
   if (user_id) {
-    const response = await fetch(`http://localhost:8000/auth/user/${user_id}`);
+    const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
+    const response = await fetch(`${backendUrl}/auth/user/${user_id}`);
     const data = await response.json();
     email = data.email || "No email found";
   }

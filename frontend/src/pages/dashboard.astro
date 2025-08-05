@@ -7,7 +7,8 @@ const userId = Astro.cookies.get('user_id')?.value;
 
 console.log("User ID:", userId);
 
-const streak = await fetch(`http://localhost:8000/users/${userId}/streak`).then(res => res.json()).then(data => data.streak_count);
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
+const streak = await fetch(`${backendUrl}/users/${userId}/streak`).then(res => res.json()).then(data => data.streak_count);
 
 ---
 
@@ -137,7 +138,8 @@ const streak = await fetch(`http://localhost:8000/users/${userId}/streak`).then(
         };
 
         try {
-          const response = await fetch("http://localhost:8000/journal/entries", {
+          const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
+          const response = await fetch(`${backendUrl}/journal/entries`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
