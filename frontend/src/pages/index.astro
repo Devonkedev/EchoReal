@@ -1,7 +1,4 @@
 ---
-  const session = Astro.cookies.get('user_id')?.value;
-  if (!session) {
-    Astro.redirect('/login');
-  } else {
-    Astro.redirect('/dashboard');
-  }
+import Login from './login.astro';
+---
+<Login />
