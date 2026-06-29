@@ -1,26 +1,19 @@
 import json
 import os
 import sqlite3
-from contextlib import contextmanager
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-from fastapi import Response  #type: ignore
-from flask import Flask, jsonify, request  #type: ignore
-from flask_cors import CORS  #type: ignore
-
-from fastapi import FastAPI, HTTPException, Request, Query, Body  #type: ignore
+from fastapi import FastAPI, HTTPException, Request, Query, Body, Response  #type: ignore
 from fastapi.middleware.cors import CORSMiddleware #type: ignore
 from fastapi.responses import JSONResponse #type: ignore
-from typing import Any, Dict, List, Optional #type: ignore
 from pydantic import BaseModel #type: ignore
-import asyncio #type: ignore
 import uvicorn #type: ignore
 
 
 class LoginRequest(BaseModel):
-    user_id: str
-    email: str
+    user_id: Optional[str] = None
+    email: Optional[str] = None
     password: str
 
 DATABASE_PATH = os.environ.get("ECHO_DB", os.path.join(os.path.dirname(__file__), "echo.db"))
@@ -129,12 +122,7 @@ def to_entry_dict(row: sqlite3.Row) -> Dict[str, Any]:
         "liked_tracks": liked_tracks,
     }
 
-app = Flask(__name__)
-CORS(app)
-
 init_db()
-
-
 
 app = FastAPI(
     title="EchoReal API",
@@ -332,7 +320,7 @@ async def get_streak(user_id: str):
     return {"streak_count": streak}
 
 @app.get("/users")
-async def get_user():
+async def list_users():
     with get_connection() as conn:
         cur = conn.execute("SELECT * FROM users ")
         cur_rows = cur.fetchall()
@@ -447,62 +435,36 @@ async def register_user(request: Request):
     user_id = data.get("user_id")
     email = data.get("email")
     password = data.get("password")
-    
+
     if not user_id or not email or not password:
         raise HTTPException(status_code=400, detail="user_id, email, and password are required")
-    
-    with get_connection() as conn:
-        cur = conn.execute(
-            "INSERT INTO auth_data (user_id, email, password) VALUES (?, ?, ?)",
-            (user_id, email, password)
-        )
-        conn.commit()
 
-    if email:
+    try:
         with get_connection() as conn:
-            cur = conn.execute(
-                "SELECT * FROM auth_data WHERE email = ? AND password = ?", 
-                (email, password)
+            conn.execute(
+                "INSERT INTO auth_data (user_id, email, password) VALUES (?, ?, ?)",
+                (user_id, email, password)
             )
-            user = cur.fetchone()
-    elif user_id:
-        with get_connection() as conn:
-            cur = conn.execute(
-                "SELECT * FROM auth_data WHERE user_id = ? AND password = ?", 
-                (user_id, password)
-            )
-            user = cur.fetchone()
+            conn.commit()
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=409, detail="User ID or email already exists")
 
-    if (not user_id and not email) or not password:
-        raise HTTPException(status_code=400, detail="email/user_id and password are required")
-    
-    with get_connection() as conn:
-        cur = conn.execute(
-            "SELECT * FROM auth_data WHERE user_id = ? AND password = ?", 
-            (user_id, password)
-        )
-        user = cur.fetchone()
-    
-    if user is None:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    # Create a session for the user
     current_date = datetime.utcnow().isoformat()
     expiry_date = (datetime.utcnow() + timedelta(days=30)).isoformat()
     with get_connection() as conn:
-        cur = conn.execute(
+        conn.execute(
             "INSERT INTO sessions (user_id, currentDate, expiryDate) VALUES (?, ?, ?)",
             (user_id, current_date, expiry_date)
         )
         conn.commit()
-    # Return session information
+
     session_info = {
         "user_id": user_id,
         "currentDate": current_date,
         "expiryDate": expiry_date
     }
-    
-    return {"status": "logged in", "user_id": user["user_id"], "session": session_info} 
+
+    return {"status": "registered", "user_id": user_id, "session": session_info}
 
 
 
@@ -514,49 +476,40 @@ async def login_user(payload: LoginRequest, response: Response):
 
     if not password:
         raise HTTPException(status_code=400, detail="password is required")
-    if not user_id or not email:
+    if not user_id and not email:
         raise HTTPException(status_code=400, detail="email or user_id is required")
-    
+
+    user = None
     if email:
         with get_connection() as conn:
             cur = conn.execute(
-                "SELECT * FROM auth_data WHERE email = ? AND password = ?", 
+                "SELECT * FROM auth_data WHERE email = ? AND password = ?",
                 (email, password)
             )
             user = cur.fetchone()
-    elif user_id:
+
+    if user is None and user_id:
         with get_connection() as conn:
             cur = conn.execute(
-                "SELECT * FROM auth_data WHERE user_id = ? AND password = ?", 
+                "SELECT * FROM auth_data WHERE user_id = ? AND password = ?",
                 (user_id, password)
             )
             user = cur.fetchone()
 
-    if (not user_id and not email) or not password:
-        raise HTTPException(status_code=400, detail="email/user_id and password are required")
-    
-    with get_connection() as conn:
-        cur = conn.execute(
-            "SELECT * FROM auth_data WHERE user_id = ? AND password = ?", 
-            (user_id, password)
-        )
-        user = cur.fetchone()
-    
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # Create a session for the user
+    actual_user_id = user["user_id"]
     current_date = datetime.utcnow().isoformat()
     expiry_date = (datetime.utcnow() + timedelta(days=30)).isoformat()
     with get_connection() as conn:
         cur = conn.execute(
             "INSERT INTO sessions (user_id, currentDate, expiryDate) VALUES (?, ?, ?)",
-            (user_id, current_date, expiry_date)
+            (actual_user_id, current_date, expiry_date)
         )
         conn.commit()
-    # Return session information
     session_info = {
-        "user_id": user_id,
+        "user_id": actual_user_id,
         "currentDate": current_date,
         "expiryDate": expiry_date
     }
@@ -564,11 +517,11 @@ async def login_user(payload: LoginRequest, response: Response):
     response.set_cookie(key="user_id", value=session_info["user_id"], path="/")
     response.set_cookie(key="currentDate", value=session_info["currentDate"], path="/")
     response.set_cookie(key="expiryDate", value=session_info["expiryDate"], path="/")
-    
-    return {"status": "logged in", "user_id": user["user_id"], "session": session_info} 
+
+    return {"status": "logged in", "user_id": actual_user_id, "session": session_info}
 
 @app.get('/auth/user/{user_id}')
-async def get_user(user_id: str):
+async def get_auth_user(user_id: str):
     if not user_id:
         raise HTTPException(status_code=400, detail="user_id is required")
     with get_connection() as conn:
@@ -581,7 +534,7 @@ async def get_user(user_id: str):
         "email": user["email"]
     }
 @app.delete('/auth/user/{user_id}')
-async def delete_user(user_id: str):
+async def delete_auth_user(user_id: str):
     if not user_id:
         raise HTTPException(status_code=400, detail="user_id is required")
     with get_connection() as conn:
@@ -590,4 +543,7 @@ async def delete_user(user_id: str):
             raise HTTPException(status_code=404, detail="User not found")
         conn.commit()
     return {"status": "deleted"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 

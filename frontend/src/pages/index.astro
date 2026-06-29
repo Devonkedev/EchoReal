@@ -1,4 +1,7 @@
 ---
-import Login from './login.astro';
+const userId = Astro.cookies.get('user_id')?.value;
+if (userId) {
+  return Astro.redirect('/dashboard');
+}
+return Astro.redirect('/login');
 ---
-<Login />

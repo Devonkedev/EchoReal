@@ -1,21 +1,16 @@
 ---
-'client:load'
-import Layout from '../layouts/Layout.astro';
-
-
 Astro.cookies.delete('user_id');
-Astro.redirect('/login')
-
 ---
 
-<Layout>
-<h1>
-    hi
-</h1>
-
-<script>
-    localStorage.clear();
-    window.location.href = '/login';
-
-</script>
-</Layout>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Logging out...</title>
+  </head>
+  <body>
+    <script>
+      localStorage.clear();
+      window.location.href = '/login';
+    </script>
+  </body>
+</html>
