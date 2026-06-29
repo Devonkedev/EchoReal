@@ -134,37 +134,37 @@ try {
 
 
 
-  <script type="module">
-    document.addEventListener("DOMContentLoaded", () => {
-      const generateBtn = document.getElementById("generateBtn");
-      const journalInput = document.getElementById("journalText");
-      const songModal = document.getElementById("songModal");
-      const songList = document.getElementById("songList");
-      const closeModalBtn = document.getElementById("closeModalBtn");
-      let selectedMood = null;
+  <script is:inline define:vars={{ backendUrl: import.meta.env.PUBLIC_BACKEND_URL || 'http://localhost:8000' }}>
+    (function() {
+      var generateBtn = document.getElementById("generateBtn");
+      var journalInput = document.getElementById("journalText");
+      var songModal = document.getElementById("songModal");
+      var songList = document.getElementById("songList");
+      var closeModalBtn = document.getElementById("closeModalBtn");
+      var selectedMood = null;
 
-      document.querySelectorAll(".mood-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
+      document.querySelectorAll(".mood-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
           selectedMood = btn.dataset.mood;
-          document.querySelectorAll(".mood-btn").forEach(b => b.classList.remove("ring", "ring-2", "ring-blue-500"));
+          document.querySelectorAll(".mood-btn").forEach(function(b) { b.classList.remove("ring", "ring-2", "ring-blue-500"); });
           btn.classList.add("ring", "ring-2", "ring-blue-500");
         });
       });
 
-      closeModalBtn.addEventListener("click", () => {
+      closeModalBtn.addEventListener("click", function() {
         songModal.classList.add("hidden");
       });
 
-      generateBtn.addEventListener("click", async () => {
-        const text = journalInput.value.trim();
+      generateBtn.addEventListener("click", async function() {
+        var text = journalInput.value.trim();
         if (!selectedMood || !text) {
           alert("Please write something and pick a mood first.");
           return;
         }
 
-        const moodIntensity = selectedMood === "happy" ? 3 : selectedMood === "sad" ? 2 : 1;
-       
-        const payload = {
+        var moodIntensity = selectedMood === "happy" ? 3 : selectedMood === "sad" ? 2 : 1;
+
+        var payload = {
           user_id: localStorage.getItem("user_id") || "default_user",
           mood: selectedMood,
           text: text,
@@ -173,17 +173,14 @@ try {
         };
 
         try {
-          const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
-          const response = await fetch(`${backendUrl}/journal/entries`, {
+          var response = await fetch(backendUrl + "/journal/entries", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
 
           if (!response.ok) {
-            const err = await response.json();
+            var err = await response.json();
             alert(err.detail || "Failed to save your entry.");
             return;
           }
@@ -194,8 +191,8 @@ try {
         catch (error) {
           console.error("Error saving journal entry:", error);
           alert("Failed to save your entry. Please try again.");
-          return;
         }
-      })});
+      });
+    })();
   </script>
 </Layout>
